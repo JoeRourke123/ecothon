@@ -6,17 +6,11 @@ import (
 	"ecothon/utils"
 	"encoding/json"
 	"fmt"
-	"time"
-
-<<<<<<< HEAD
 	"github.com/gofiber/fiber/v2"
-)
-
-func CreateUser(c *fiber.Ctx) error {
-=======
-	"github.com/gofiber/fiber"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
+	"time"
 )
 
 func checkPass(checkPassword, hashedPassword []byte) bool {
@@ -39,8 +33,7 @@ func generateHash(pass []byte) string {
 	return string(hash)
 }
 
-func CreateUser(c *fiber.Ctx) {
->>>>>>> c56fd2541399fd8ff88273956a4e78735e581409
+func CreateUser(c *fiber.Ctx) error {
 	collection, err := utils.GetMongoDbCollection("users")
 	if err != nil {
 		return fiber.ErrInternalServerError
@@ -66,4 +59,41 @@ func CreateUser(c *fiber.Ctx) {
 	}
 
 	return c.JSON(res)
+}
+
+func LoginUser(ctx *fiber.Ctx) error {
+	type Login struct {
+		Email    string `json:"email,omitempty"`
+		Password string `json:"password,omitempty"`
+	}
+
+	var loginData Login
+	json.Unmarshal([]byte(ctx.Body()), &loginData)
+
+	//collection, err := utils.GetMongoDbCollection("users")
+	//if err != nil {
+	//	return fiber.ErrInternalServerError
+	//}
+
+	var user models.User
+	//
+	//filter := bson.D{
+	//	{
+	//		"$and",
+	//		bson.A{
+	//			bson.D{{ "email", loginData.Email}},
+	//		},
+	//	},
+	//}
+
+	//cur := collection.FindOne(ctx.Context(), &filter)
+
+	t := utils.Generate(&utils.TokenPayload{
+		Username: user.Username,
+	})
+
+	return ctx.JSON(bson.D{
+		{"user", ctx.JSON(user)},
+		{"tokens", ctx.JSON(t)},
+	})
 }

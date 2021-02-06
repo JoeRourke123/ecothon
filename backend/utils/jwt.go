@@ -3,6 +3,7 @@ package utils
 import (
 	"errors"
 	"fmt"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -13,7 +14,7 @@ const TOKENKEY string = "hello"
 
 // TokenPayload defines the payload for the token
 type TokenPayload struct {
-	ID uint
+	Username string
 }
 
 // Generate generates the jwt token based on payload
