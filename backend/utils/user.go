@@ -30,6 +30,10 @@ func AddUserAchievement(username string, postID primitive.ObjectID,
 		return err
 	}
 
+	var achievement models.Achievement
+	cur := achievementCol.FindOne(c.Context(), bson.D{{"_id", achievementID}})
+	cur.Decode(&achievement)
+
 	_, err = achievementCol.UpdateOne(c.Context(),
 		bson.D{{"_id", achievementID}},
 		bson.D{{"$push", bson.D{{
@@ -51,10 +55,24 @@ func AddUserAchievement(username string, postID primitive.ObjectID,
 					"post":        postID,
 					"achievement": achievementID,
 				},
-			}}}})
+			}}}, {
+			"$inc", bson.D{{
+				"points", achievement.Points,
+				}},
+			}})
 
 		return err
 	} else {
 		return err
 	}
+}
+
+func GetPosts(username string, posts *[]bson.M, c *fiber.Ctx) {
+	postCol, _ := GetMongoDbCollection("posts")
+
+	cur, _ := postCol.Find(c.Context(), bson.D{{
+		"user", username,
+	}})
+	defer cur.Close(c.Context())
+	cur.All(c.Context(), &posts)
 }
