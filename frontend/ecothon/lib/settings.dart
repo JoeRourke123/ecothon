@@ -5,6 +5,7 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
+        SizedBox(height: 50),
         Container(
           height: 240.0,
           width: 240.0,
@@ -17,6 +18,8 @@ class ProfilePage extends StatelessWidget {
             shape: BoxShape.circle,
           ),
         ),
+        SizedBox(height: 20),
+        Text('Shrek Shrek', style: DefaultTextStyle.of(context).style.apply(fontSizeFactor: 2.0)),
         Center(
           child: ElevatedButton(
               child: Text('Log In'),
