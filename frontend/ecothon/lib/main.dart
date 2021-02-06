@@ -38,11 +38,30 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+
+  int _selectedIndex = 0;
+  int _number = 0;
+  var _navBarItems = const <BottomNavigationBarItem>[
+    BottomNavigationBarItem(
+      icon: Icon(Icons.messenger_rounded),
+      label: 'Feed',
+      backgroundColor: Colors.blue,
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.star),
+      label: 'Achievements',
+      backgroundColor: Colors.amber,
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.settings),
+      label: 'Settings',
+      backgroundColor: Colors.amber,
+    ),
+  ];
+
   PageController _controller = PageController(
     initialPage: 0,
   );
-
-  int _selectedIndex = 0;
 
   @override
   void dispose() {
@@ -53,6 +72,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+      _number = index;
       _controller.jumpToPage(index);
     });
   }
@@ -60,43 +80,39 @@ class _MyHomePageState extends State<MyHomePage> {
   void _onPagedChanged(int index) {
     setState(() {
       _selectedIndex = index;
+      _number = index;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: PageView(
-          controller: _controller,
-          onPageChanged: _onPagedChanged,
-          children: [
-            FeedPage(),
-            AchievementsPage(),
-            SettingsPage(),
-          ],
-        ),
-        bottomNavigationBar: BottomNavigationBar(
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.messenger_rounded),
-              label: 'Feed',
-              backgroundColor: Colors.blue,
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.star),
-              label: 'Achievements',
-              backgroundColor: Colors.amber,
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.settings),
-              label: 'Settings',
-              backgroundColor: Colors.amber,
-            ),
-          ],
-          currentIndex: _selectedIndex,
-          //selectedItemColor: Colors.green[800],
-          onTap: _onItemTapped,
-        ),
-    );
+    return WillPopScope(
+        onWillPop: () async {
+          if (_number != 0) {
+            _onItemTapped(0);
+            return false;
+          }
+          return true;
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(_navBarItems[_selectedIndex].label),
+          ),
+          body: PageView(
+            controller: _controller,
+            onPageChanged: _onPagedChanged,
+            children: [
+              FeedPage(),
+              AchievementsPage(),
+              SettingsPage(),
+            ],
+          ),
+          bottomNavigationBar: BottomNavigationBar(
+            items: _navBarItems,
+            currentIndex: _selectedIndex,
+            //selectedItemColor: Colors.green[800],
+            onTap: _onItemTapped,
+          ),
+        ));
   }
 }

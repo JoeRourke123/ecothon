@@ -80,14 +80,14 @@ func LoginUser(ctx *fiber.Ctx) error {
 
 	cur := collection.FindOne(ctx.Context(), &filter)
 
-	if cur == nil {
-		return ctx.Status(404).JSON(bson.D{{"error", "There's no account for that email!"}})
+	if cur.Err() != nil {
+		return ctx.Status(404).JSON(map[string]string{"error": "We can't find an account with that email!"})
 	}
 
 	cur.Decode(&user)
 
-	if generateHash([]byte(loginData.Password)) == user.Password {
-		return ctx.Status(403).JSON(bson.D{{"error", "That's not your password!"}})
+	if !checkPass([]byte(loginData.Password), []byte(user.Password)) {
+		return ctx.Status(403).JSON(map[string]string{"error": "That's not your password!"})
 	}
 
 	t := utils.Generate(&utils.TokenPayload{
