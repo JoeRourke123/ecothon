@@ -72,7 +72,12 @@ func LoginUser(ctx *fiber.Ctx) error {
 	}
 
 	var loginData Login
+
+
 	json.Unmarshal([]byte(ctx.Body()), &loginData)
+
+	print(loginData.Email)
+	print(loginData.Password)
 
 	collection, err := utils.GetMongoDbCollection("users")
 	if err != nil {

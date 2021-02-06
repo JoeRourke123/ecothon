@@ -8,7 +8,7 @@ import (
 
 type Location struct {
 	Type        string    `json:"type" bson:"type"`
-	Coordinates []float64 `json:"coordinates" bson:"coordinates"`
+	Coordinates bson.A `json:"coordinates" bson:"coordinates"`
 }
 
 type Post struct {

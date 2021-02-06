@@ -14,4 +14,5 @@ type Achievement struct {
 	Points          int8               `json:"points,omitempty"`
 	AchievedBy      []bson.M           `json:"achieved_by"`
 	Details         bson.M             `json:"details,omitempty"`
+	ImageURL		string				`json:"image_url,omitempty"`
 }
