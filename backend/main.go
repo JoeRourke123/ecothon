@@ -1,10 +1,10 @@
-package backend
+package main
 
 import (
-"./router"
-"log"
+	"ecothon/router"
+	"log"
 
-"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber"
 )
 
 const port string = ":3000"

@@ -4,7 +4,7 @@
 *.dll
 *.so
 *.dylib
-
+pkg/
 # Test binary, built with `go test -c`
 *.test
 
@@ -131,3 +131,4 @@ app.*.symbols
 !**/ios/**/default.perspectivev3
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 !/dev/ci/**/Gemfile.lock
+backend/__debug_bin
