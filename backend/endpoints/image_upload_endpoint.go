@@ -61,15 +61,11 @@ func CreateUploadURL(c *fiber.Ctx) error {
 		fmt.Println(err.Error())
 	}
 
-	fmt.Println(url)
-
 	var buf bytes.Buffer
 	enc := json.NewEncoder(&buf)
 	enc.SetEscapeHTML(false)
 
 	enc.Encode(map[string]string{"presigned_url": url, "final_url": strings.Split(url, "?")[0], "filename": filename})
-
-	fmt.Println(string([]byte(buf.Bytes())))
 
 	return c.Send([]byte(buf.Bytes()))
 }
