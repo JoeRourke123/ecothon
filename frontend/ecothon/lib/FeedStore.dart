@@ -45,6 +45,11 @@ class FeedStore extends ChangeNotifier {
     FeedItemData("Last"),
   ];
 
+  void setFeedItems(List<FeedItemData> items) {
+    feedItemData = items;
+    notifyListeners();
+  }
+
   void add(FeedItemData item) {
     feedItemData.add(item);
     notifyListeners();
