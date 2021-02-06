@@ -19,20 +19,13 @@ class _FeedPageState extends State<FeedPage>
 
   @override
   Widget build(BuildContext context) {
-    var snackbar = SnackBar(content: Text("Failed to fetch feed. Please retry"));
-    return Scaffold(
-        appBar: AppBar(
-          title: Text("Feed"),
-        ),
-        body: RefreshIndicator(
+    return Container(
+        child: RefreshIndicator(
             onRefresh: _pullRefresh,
             child: ListView.separated(
               padding: EdgeInsets.all(8),
               itemCount: Provider.of<FeedStore>(context).feedItemData.length,
               itemBuilder: (context, index) {
-                if (err) {
-                  Scaffold.of(context).showSnackBar(snackbar);
-                }
                 return Consumer<FeedStore>(
                   builder: (context, feed, child) {
                     return FeedItem(
@@ -51,14 +44,14 @@ class _FeedPageState extends State<FeedPage>
     List<FeedItemData> items = [];
     http.Response res = await http.get('http://ecothon.space/api/all');
     if (res.statusCode == 200) {
-      err = false;
       var decoded = json.decode(res.body);
       for (var i in decoded) {
         items.add(FeedItemData.fromJson(i));
       }
       Provider.of<FeedStore>(context, listen: false).setFeedItems(items);
     } else {
-      err = true;
+      Scaffold.of(context).showSnackBar(
+          SnackBar(content: Text("Failed to fetch feed. Please retry")));
     }
   }
 
