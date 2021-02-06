@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:ecothon/FeedStore.dart';
+import 'package:ecothon/generalStore.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 
@@ -24,9 +24,9 @@ class _FeedPageState extends State<FeedPage>
             onRefresh: _pullRefresh,
             child: ListView.separated(
               padding: EdgeInsets.all(8),
-              itemCount: Provider.of<FeedStore>(context).feedItemData.length,
+              itemCount: Provider.of<GeneralStore>(context).feedItemData.length,
               itemBuilder: (context, index) {
-                return Consumer<FeedStore>(
+                return Consumer<GeneralStore>(
                   builder: (context, feed, child) {
                     return FeedItem(
                       data: feed.feedItemData[index],
@@ -42,14 +42,21 @@ class _FeedPageState extends State<FeedPage>
 
   Future<void> _pullRefresh() async {
     List<FeedItemData> items = [];
-    http.Response res = await http.get('http://ecothon.space/api/all');
-    if (res.statusCode == 200) {
-      var decoded = json.decode(res.body);
-      for (var i in decoded) {
-        items.add(FeedItemData.fromJson(i));
+    http.Response res;
+    try {
+      http.Response res = await http.get('https://ecothon.space/api/posts');
+
+      if (res.statusCode == 200) {
+        var decoded = json.decode(res.body);
+        for (var i in decoded) {
+          items.add(FeedItemData.fromJson(i));
+        }
+        Provider.of<GeneralStore>(context, listen: false).setFeedItems(items);
+      } else {
+        Scaffold.of(context).showSnackBar(
+            SnackBar(content: Text("Failed to fetch feed. Please retry")));
       }
-      Provider.of<FeedStore>(context, listen: false).setFeedItems(items);
-    } else {
+    } catch (Exception) {
       Scaffold.of(context).showSnackBar(
           SnackBar(content: Text("Failed to fetch feed. Please retry")));
     }

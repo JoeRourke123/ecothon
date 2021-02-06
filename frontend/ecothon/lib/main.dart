@@ -1,61 +1,71 @@
-import 'package:ecothon/FeedStore.dart';
+import 'package:ecothon/generalStore.dart';
+import 'package:ecothon/login.dart';
 import 'package:flutter/material.dart';
 import 'package:ecothon/achievements.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
-import 'settings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:ecothon/feed.dart';
+import 'settings.dart';
 
-void main() {
+main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  GeneralStore store = GeneralStore();
+  final storage = new FlutterSecureStorage();
+
+  bool isLoggedIn = await storage.containsKey(key: "username") &&
+      await storage.containsKey(key: "token");
+
+  String username = await storage.read(key: "username");
+  String token = await storage.read(key: "token");
+  store.setLoginData(username, token);
+
   runApp(ChangeNotifierProvider(
-    create: (context) => FeedStore(),
-    child: MyApp(),
+    create: (context) => store,
+    child: MyApp(isLoggedIn: isLoggedIn),
   ));
 }
 
 class MyApp extends StatelessWidget {
+  final bool isLoggedIn;
+
+  const MyApp({Key key, this.isLoggedIn}) : super(key: key);
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Ecothon',
       theme: ThemeData(
         primarySwatch: Colors.green,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: (isLoggedIn ? MyHomePage() : LoginPage()),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  final String title;
+  MyHomePage({Key key}) : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
-  int _selectedIndex = 1;
-  int _number = 0;
+  int _selectedIndex = 0;
   var _navBarItems = const <BottomNavigationBarItem>[
-    BottomNavigationBarItem(
-      icon: Icon(Icons.star),
-      label: 'Achievements',
-      backgroundColor: Colors.blue,
-    ),
     BottomNavigationBarItem(
       icon: Icon(Icons.messenger_rounded),
       label: 'Feed',
-      backgroundColor: Colors.amber,
     ),
     BottomNavigationBarItem(
-      icon: Icon(Icons.person),
-      label: 'Profile',
-      backgroundColor: Colors.amber,
+      icon: Icon(Icons.star),
+      label: 'Achievements',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.settings),
+      label: 'Settings',
     ),
   ];
 
@@ -72,7 +82,6 @@ class _MyHomePageState extends State<MyHomePage> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
-      _number = index;
       _controller.jumpToPage(index);
     });
   }
@@ -80,7 +89,6 @@ class _MyHomePageState extends State<MyHomePage> {
   void _onPagedChanged(int index) {
     setState(() {
       _selectedIndex = index;
-      _number = index;
     });
   }
 
@@ -88,7 +96,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return WillPopScope(
         onWillPop: () async {
-          if (_number != 1) {
+          if (_selectedIndex != 1) {
             _onItemTapped(1);
             return false;
           }
@@ -102,15 +110,15 @@ class _MyHomePageState extends State<MyHomePage> {
             controller: _controller,
             onPageChanged: _onPagedChanged,
             children: [
-              AchievementsPage(),
               FeedPage(),
+              AchievementsPage(),
               ProfilePage(),
             ],
           ),
           bottomNavigationBar: BottomNavigationBar(
             items: _navBarItems,
             currentIndex: _selectedIndex,
-            //selectedItemColor: Colors.green[800],
+            selectedItemColor: Colors.green[800],
             onTap: _onItemTapped,
           ),
         ));

@@ -1,8 +1,17 @@
 import 'package:ecothon/feed.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-class FeedStore extends ChangeNotifier {
+class GeneralStore extends ChangeNotifier {
+  final storage = new FlutterSecureStorage();
+  String username;
+  String token;
   List<FeedItemData> feedItemData = [];
+
+  void setLoginData(String username, String token) {
+    this.username = username;
+    this.token = token;
+  }
 
   void setFeedItems(List<FeedItemData> items) {
     feedItemData = items;
