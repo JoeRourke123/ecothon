@@ -20,6 +20,8 @@ type upload struct {
 	Extension string `json:"extension,omitempty"`
 }
 
+// CreateUploadURL generates a presigned URL to allow uploading to the
+// Digital Ocean Spaces bucket
 func CreateUploadURL(c *fiber.Ctx) error {
 	var user models.User
 	var username string = c.Locals("USER").(string)

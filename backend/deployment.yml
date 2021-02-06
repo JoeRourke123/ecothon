@@ -16,7 +16,7 @@ spec:
       containers:
       - name: application
         image: georgehoneywood/ecothon
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         ports:
           - containerPort: 3000
         env: 
