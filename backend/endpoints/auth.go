@@ -6,14 +6,13 @@ import (
 	"ecothon/utils"
 	"encoding/json"
 
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 )
 
-func CreateUser(c *fiber.Ctx) {
+func CreateUser(c *fiber.Ctx) error {
 	collection, err := utils.GetMongoDbCollection("users")
 	if err != nil {
-		c.Status(500).Send(err)
-		return
+		return fiber.ErrInternalServerError
 	}
 
 	var user models.User
@@ -21,10 +20,8 @@ func CreateUser(c *fiber.Ctx) {
 
 	res, err := collection.InsertOne(context.Background(), user)
 	if err != nil {
-		c.Status(500).Send(err)
-		return
+		return fiber.ErrInternalServerError
 	}
 
-	response, _ := json.Marshal(res)
-	c.Send(response)
+	return c.JSON(res)
 }

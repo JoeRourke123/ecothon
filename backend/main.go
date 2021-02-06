@@ -4,7 +4,7 @@ import (
 	"ecothon/router"
 	"log"
 
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 )
 
 const port string = ":3000"

@@ -1,18 +1,36 @@
 package middleware
 
 import (
-	"github.com/gofiber/fiber"
-	jwtware "github.com/gofiber/jwt"
+	"ecothon/utils"
+	"github.com/gofiber/fiber/v2"
+	"strings"
 )
 
-// Protected protect routes
-func Protected() fiber.Handler {
-	return jwtware.New(jwtware.Config{
-		SigningKey:   []byte("secret"),
-		ErrorHandler: jwtError,
-	})
-}
+// Auth is the authentication middleware
+func Auth(c *fiber.Ctx) error {
+	h := c.Get("Authorization")
 
-func jwtError(c *fiber.Ctx, err error) {
-	c.SendStatus(403)
+	if h == "" {
+		return fiber.ErrUnauthorized
+	}
+
+	// Spliting the header
+	chunks := strings.Split(h, " ")
+
+	// If header signature is not like `Bearer <token>`, then throw
+	// This is also required, otherwise chunks[1] will throw out of bound error
+	if len(chunks) < 2 {
+		return fiber.ErrUnauthorized
+	}
+
+	// Verify the token which is in the chunks
+	user, err := utils.Verify(chunks[1])
+
+	if err != nil {
+		return fiber.ErrUnauthorized
+	}
+
+	c.Locals("USER", user.ID)
+
+	return c.Next()
 }

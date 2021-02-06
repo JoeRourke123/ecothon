@@ -4,18 +4,17 @@ import (
 	"ecothon/models"
 	"ecothon/utils"
 	"encoding/json"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	options2 "go.mongodb.org/mongo-driver/mongo/options"
 )
 
 const MAX_DISTANCE int = 10000
 
-func GetFeed(c *fiber.Ctx) {
+func GetFeed(c *fiber.Ctx) error {
 	collection, err := utils.GetMongoDbCollection("posts")
 	if err != nil {
-		c.Status(500).Send(err)
-		return
+		return fiber.ErrInternalServerError
 	}
 
 	var loc models.Location
@@ -42,8 +41,7 @@ func GetFeed(c *fiber.Ctx) {
 	cur, err := collection.Find(c.Context(), filter, options)
 
 	if err != nil {
-		c.Status(500).Send(err)
-		return
+		return fiber.ErrInternalServerError
 	}
 	if cur != nil {
 		defer cur.Close(c.Context())
@@ -52,10 +50,8 @@ func GetFeed(c *fiber.Ctx) {
 	cur.All(c.Context(), &results)
 
 	if results == nil {
-		c.SendStatus(404)
-		return
+		return fiber.ErrNotFound
 	}
 
-	data, _ := json.Marshal(results)
-	c.Send(data)
+	return c.JSON(results)
 }
