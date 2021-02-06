@@ -1,12 +1,14 @@
 package endpoints
 
 import (
+	"bytes"
 	"ecothon/models"
 	"ecothon/utils"
 	"encoding/json"
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -36,21 +38,38 @@ func CreateUploadURL(c *fiber.Ctx) error {
 	s3Config := &aws.Config{
 		Credentials: credentials.NewStaticCredentials(key, secret, ""),
 		Endpoint:    aws.String("https://fra1.digitaloceanspaces.com"),
-		Region:      aws.String("us-east-1"),
+		Region:      aws.String("fra1"),
 	}
 
 	newSession := session.New(s3Config)
 	s3Client := s3.New(newSession)
 
+	filename := fmt.Sprintf("%s-%s.%s", user.Username, strconv.FormatInt(time.Now().Unix(), 10), up.Extension)
+
+	content := fmt.Sprintf("image/%s", up.Extension)
+
 	req, _ := s3Client.PutObjectRequest(&s3.PutObjectInput{
-		Bucket: aws.String("ecothon"),
-		Key:    aws.String(fmt.Sprintf("%s-%s.%s", user.Username, strconv.FormatInt(time.Now().Unix(), 10), up.Extension)),
+		Bucket:      aws.String("ecothon"),
+		Key:         aws.String(filename),
+		ContentType: aws.String(content),
+		//ACL:         aws.String("public-write"),
+		//ContentMD5:  aws.String("false"),
 	})
 
-	url, err := req.Presign(5 * time.Minute)
+	url, err := req.Presign(5 * time.Minute) //change this
 	if err != nil {
 		fmt.Println(err.Error())
 	}
 
-	return c.JSON(map[string]string{"presigned_url": url})
+	fmt.Println(url)
+
+	var buf bytes.Buffer
+	enc := json.NewEncoder(&buf)
+	enc.SetEscapeHTML(false)
+
+	enc.Encode(map[string]string{"presigned_url": url, "final_url": strings.Split(url, "?")[0], "filename": filename})
+
+	fmt.Println(string([]byte(buf.Bytes())))
+
+	return c.Send([]byte(buf.Bytes()))
 }
