@@ -104,7 +104,7 @@ class _MyHomePageState extends State<MyHomePage> {
             children: [
               AchievementsPage(),
               FeedPage(),
-              SettingsPage(),
+              ProfilePage(),
             ],
           ),
           bottomNavigationBar: BottomNavigationBar(
