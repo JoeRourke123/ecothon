@@ -11,7 +11,22 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-        child: Text("This is the settings page"));
+    return MaterialApp(
+        home: Scaffold(
+      body: Container(
+        height: 240.0,
+        width: 240.0,
+        alignment: Alignment.topCenter,
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/shrek.jpg'),
+            fit: BoxFit.fill,
+          ),
+          shape: BoxShape.circle,
+        ),
+      ),
+    ));
   }
 }
+
+

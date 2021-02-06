@@ -50,7 +50,7 @@ class _FeedPageState extends State<FeedPage>
       }
       Provider.of<FeedStore>(context, listen: false).setFeedItems(items);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
+      Scaffold.of(context).showSnackBar(
           SnackBar(content: Text("Failed to fetch feed. Please retry")));
     }
   }
