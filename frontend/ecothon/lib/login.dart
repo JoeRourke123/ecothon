@@ -27,18 +27,18 @@ class _LoginPageState extends State<LoginPage> {
           .showSnackBar(SnackBar(content: Text("Processing")));
       try {
         http.Response res = await http
-            .post("https://ecothon.space/api/auth/login", body: {
+            .post("http://192.168.0.24:3000/api/auth/login", body: jsonEncode({
           "email": _emailController.text,
           "password": _passwordController.text
-        });
+        }));
         _scaffoldKey.currentState.hideCurrentSnackBar();
         if (res.statusCode == 200) {
-          var data = json.decode(res.body);
+          var data = jsonDecode(res.body);
           String username = data["user"]["username"];
-          String token = data["token"];
+          String token = data["auth"];
+          await storage.write(key: "username", value: username);
+          await storage.write(key: "token", value: token);
 
-          storage.write(key: "username", value: username);
-          storage.write(key: "token", value: token);
           Provider.of<GeneralStore>(context, listen: false)
               .setLoginData(username, token);
 
