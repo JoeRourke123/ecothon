@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:ecothon/post.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -104,8 +105,16 @@ class _AchievementScreenState extends State<AchievementScreen> {
 								crossAxisAlignment: CrossAxisAlignment.end,
 								mainAxisAlignment: MainAxisAlignment.spaceAround,
 								children: [
-									MaterialButton(child: Text("Complete"), onPressed: () {}, color: Colors.green.shade600, textColor: Colors.white,),
-									MaterialButton(child: Text("Post"), onPressed: () { }, color: Colors.green.shade800, textColor: Colors.white)
+									MaterialButton(child: Text("Complete"), onPressed: () {
+
+									}, color: Colors.green.shade600, textColor: Colors.white,),
+									MaterialButton(child: Text("Post"), onPressed: () {
+										Navigator.of(context).push(
+											MaterialPageRoute(
+												builder: (context) => PostPage(achievement: widget.achievement,)
+											)
+										);
+									}, color: Colors.green.shade800, textColor: Colors.white)
 								]
 							)
 						)
