@@ -23,7 +23,7 @@ class ProfilePage extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => LoginPage()),
+                  MaterialPageRoute(builder: (context) => TempLoginPage()),
                 );
               }),
         ),
@@ -32,7 +32,7 @@ class ProfilePage extends StatelessWidget {
   }
 }
 
-class LoginPage extends StatelessWidget {
+class TempLoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
