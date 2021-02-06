@@ -11,10 +11,7 @@ class AchievementsPage extends StatefulWidget {
 class _AchievementsPageState extends State<AchievementsPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text("Achievements"),
-        ),
-        body: Text("This is the settings page"));
+    return Container(
+        child: Text("This is the settings page"));
   }
 }
