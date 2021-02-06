@@ -3,6 +3,7 @@ package endpoints
 import (
 	"context"
 	"ecothon/models"
+	"ecothon/responses"
 	"ecothon/utils"
 	"encoding/json"
 	"fmt"
@@ -14,13 +15,7 @@ import (
 )
 
 func checkPass(checkPassword, hashedPassword []byte) bool {
-	error := bcrypt.CompareHashAndPassword(hashedPassword, checkPassword)
-
-	if error == nil {
-		return true
-	}
-
-	return false
+	return bcrypt.CompareHashAndPassword(hashedPassword, checkPassword) == nil
 }
 
 func generateHash(pass []byte) string {
@@ -70,30 +65,47 @@ func LoginUser(ctx *fiber.Ctx) error {
 	var loginData Login
 	json.Unmarshal([]byte(ctx.Body()), &loginData)
 
-	//collection, err := utils.GetMongoDbCollection("users")
-	//if err != nil {
-	//	return fiber.ErrInternalServerError
-	//}
+	collection, err := utils.GetMongoDbCollection("users")
+	if err != nil {
+		return fiber.ErrInternalServerError
+	}
 
 	var user models.User
-	//
-	//filter := bson.D{
-	//	{
-	//		"$and",
-	//		bson.A{
-	//			bson.D{{ "email", loginData.Email}},
-	//		},
-	//	},
-	//}
 
-	//cur := collection.FindOne(ctx.Context(), &filter)
+	filter := bson.D{
+		{
+			"email", loginData.Email,
+		},
+	}
+
+	cur := collection.FindOne(ctx.Context(), &filter)
+
+	if cur == nil {
+		return ctx.Status(404).JSON(bson.D{{"error", "There's no account for that email!"}})
+	}
+
+	cur.Decode(&user)
+
+	if generateHash([]byte(loginData.Password)) == user.Password {
+		return ctx.Status(403).JSON(bson.D{{"error", "That's not your password!"}})
+	}
 
 	t := utils.Generate(&utils.TokenPayload{
 		Username: user.Username,
 	})
 
-	return ctx.JSON(bson.D{
-		{"user", ctx.JSON(user)},
-		{"tokens", ctx.JSON(t)},
-	})
+	return ctx.JSON(
+		&responses.AuthResponse{
+			User: &responses.UserResponse{
+				Email: user.Email,
+				Username: user.Username,
+				FirstName: user.FirstName,
+				LastName: user.LastName,
+				AccountCreated: user.AccountCreated,
+				StartingCarbon: user.StartingCarbon,
+				CurrentCarbon: user.CurrentCarbon,
+			},
+			Auth: &t,
+		},
+	)
 }
