@@ -2,13 +2,13 @@ package utils
 
 import (
 	"context"
-"log"
-"os"
-"fmt"
+	"fmt"
+	"log"
+	"os"
 
-"go.mongodb.org/mongo-driver/mongo"
-"go.mongodb.org/mongo-driver/mongo/options"
-"go.mongodb.org/mongo-driver/mongo/readpref"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
 //GetMongoDbConnection get connection of mongodb
@@ -28,14 +28,14 @@ func GetMongoDbConnection() (*mongo.Client, error) {
 	return client, nil
 }
 
-func getMongoDbCollection(DbName string, CollectionName string) (*mongo.Collection, error) {
+func GetMongoDbCollection(CollectionName string) (*mongo.Collection, error) {
 	client, err := GetMongoDbConnection()
 
 	if err != nil {
 		return nil, err
 	}
 
-	collection := client.Database(DbName).Collection(CollectionName)
+	collection := client.Database("ecothon").Collection(CollectionName)
 
 	return collection, nil
 }
