@@ -50,9 +50,14 @@ class _LoginPageState extends State<LoginPage> {
           String err = json.decode(res.body)["error"];
           _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(err)));
         } else {
-          print(res.statusCode);
-          _scaffoldKey.currentState.showSnackBar(
-              SnackBar(content: Text("Failed to login please try again")));
+          String err;
+          try {
+            err = jsonDecode(res.body)["error"];
+          } catch (Exception) {
+            err = jsonDecode(res.reasonPhrase);
+          } finally {
+            _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(err)));
+          }
         }
       } catch (Exception) {
         print(Exception);
