@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:ecothon/generalStore.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter/services.dart';
+import 'package:geolocator/geolocator.dart';
 
 class FeedPage extends StatefulWidget {
   FeedPage({Key key, this.title}) : super(key: key);
@@ -19,6 +21,7 @@ class _FeedPageState extends State<FeedPage>
 
   @override
   Widget build(BuildContext context) {
+    _pullRefresh();
     return Container(
         child: RefreshIndicator(
             onRefresh: _pullRefresh,
@@ -42,21 +45,38 @@ class _FeedPageState extends State<FeedPage>
 
   Future<void> _pullRefresh() async {
     List<FeedItemData> items = [];
-    http.Response res;
     try {
-      http.Response res = await http.get('https://ecothon.space/api/posts');
+      final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
+      Position position = await geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.best);
+      http.Response res = await http.post('https://ecothon.space/api/posts',
+          body: jsonEncode({
+            "type": "Point",
+            "location": [position.latitude, position.longitude]
+          }),
+          headers: {
+            "Authorization": "Bearer " +
+                Provider.of<GeneralStore>(context, listen: false).token
+          });
 
       if (res.statusCode == 200) {
-        var decoded = json.decode(res.body);
+        var decoded = jsonDecode(res.body);
         for (var i in decoded) {
           items.add(FeedItemData.fromJson(i));
         }
         Provider.of<GeneralStore>(context, listen: false).setFeedItems(items);
       } else {
-        Scaffold.of(context).showSnackBar(
-            SnackBar(content: Text("Failed to fetch feed. Please retry")));
+        String err;
+        try {
+          err = jsonDecode(res.body)["error"];
+        } catch (Exception) {
+          err = res.reasonPhrase;
+        } finally {
+          Scaffold.of(context).showSnackBar(SnackBar(content: Text(err)));
+        }
       }
     } catch (Exception) {
+      print(Exception);
       Scaffold.of(context).showSnackBar(
           SnackBar(content: Text("Failed to fetch feed. Please retry")));
     }
