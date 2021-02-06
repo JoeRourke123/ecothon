@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.green,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: MyHomePage(title: 'Flutter Demo Home Page'),
@@ -42,21 +42,61 @@ class _MyHomePageState extends State<MyHomePage> {
     initialPage: 0,
   );
 
+  int _selectedIndex = 0;
+
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
   }
 
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+      _controller.jumpToPage(index);
+    });
+  }
+
+  void _onPagedChanged(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return PageView(
-      controller: _controller,
-      children: [
-        FeedPage(),
-        AchievementsPage(),
-        SettingsPage(),
-      ],
+    return Scaffold(
+        body: PageView(
+          controller: _controller,
+          onPageChanged: _onPagedChanged,
+          children: [
+            FeedPage(),
+            AchievementsPage(),
+            SettingsPage(),
+          ],
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.messenger_rounded),
+              label: 'Feed',
+              backgroundColor: Colors.blue,
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.star),
+              label: 'Achievements',
+              backgroundColor: Colors.amber,
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.settings),
+              label: 'Settings',
+              backgroundColor: Colors.amber,
+            ),
+          ],
+          currentIndex: _selectedIndex,
+          //selectedItemColor: Colors.green[800],
+          onTap: _onItemTapped,
+        ),
     );
   }
 }
