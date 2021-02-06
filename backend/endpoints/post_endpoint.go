@@ -15,8 +15,10 @@ import (
 
 func CreatePost(c *fiber.Ctx) error {
 	var user models.User
-	var userID string = c.Locals("USER").(string)
-	utils.GetUser(userID, c, &user)
+	var username string = c.Locals("USER").(string)
+	utils.GetUser(username, c, &user)
+
+	now := time.Now()
 
 	collection, err := utils.GetMongoDbCollection("posts")
 
@@ -28,18 +30,26 @@ func CreatePost(c *fiber.Ctx) error {
 	json.Unmarshal([]byte(c.Body()), &post)
 
 	post.Geolocation.Type = "Point"
-	post.CreatedAt = time.Now()
+	post.CreatedAt = now
 
 	if post.Comments == nil {
 		post.Comments = []bson.M{}
 	}
 	if post.LikedBy == nil {
-		post.LikedBy = []primitive.ObjectID{}
+		post.LikedBy = []string{}
 	}
 
-	res, err := collection.InsertOne(context.Background(), user)
+	res, err := collection.InsertOne(context.Background(), post)
 	if err != nil {
 		return fiber.ErrInternalServerError
+	}
+
+	if post.Achievement != primitive.NilObjectID {
+		err = utils.AddUserAchievement(username, res.InsertedID.(primitive.ObjectID), post.Achievement, c, now)
+
+		if err != nil {
+			return err
+		}
 	}
 
 	return c.JSON(res)

@@ -1,0 +1,27 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ecothon
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      name: ecothon
+  template:
+    metadata:
+      labels:
+        name: ecothon
+    spec:
+      containers:
+      - name: application
+        image: georgehoneywood/ecothon
+        imagePullPolicy: IfNotPresent
+        ports:
+          - containerPort: 3000
+        env: 
+        - name: ECOTHON_DB_PASS
+          valueFrom:
+            secretKeyRef:
+              name: database-secrets
+              key: ECOTHON_DB_PASS

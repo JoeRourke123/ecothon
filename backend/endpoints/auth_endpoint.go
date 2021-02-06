@@ -81,7 +81,7 @@ func LoginUser(ctx *fiber.Ctx) error {
 	cur := collection.FindOne(ctx.Context(), &filter)
 
 	if cur.Err() != nil {
-		return ctx.Status(404).JSON(map[string]string{"error": "We can't find an account with that email!"})
+		return ctx.Status(403).JSON(map[string]string{"error": "We can't find an account with that email!"})
 	}
 
 	cur.Decode(&user)
@@ -108,4 +108,30 @@ func LoginUser(ctx *fiber.Ctx) error {
 			Auth: &t,
 		},
 	)
+}
+
+func UserProfile(c *fiber.Ctx) error {
+	var currentUser models.User
+	currentUsername := c.Locals("USER").(string)
+	utils.GetUser(currentUsername, c, &currentUser)
+
+	var user models.User
+	viewingUsername := c.Params("username")
+	utils.GetUser(viewingUsername, c, &user)
+
+	var isFollowing bool
+	if len(user.Followers) < len(currentUser.Following) {
+		isFollowing = utils.BinarySearch(user.Followers, currentUsername)
+	} else {
+		isFollowing = utils.BinarySearch(currentUser.Following, c.Params("username"))
+	}
+
+	var posts []bson.M
+	utils.GetPosts(viewingUsername, &posts, c)
+
+	return c.JSON(bson.M{
+		"following": isFollowing,
+		"user": user,
+		"posts": posts,
+	})
 }

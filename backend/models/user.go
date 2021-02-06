@@ -15,7 +15,11 @@ type User struct {
 	Password       string               `json:"password,omitempty,secret"`
 	LikedPosts     []primitive.ObjectID `json:"liked_posts"`
 	Achievements   []primitive.ObjectID `json:"achievements"`
+	Points         int16                `json:"points"`
 	StartingCarbon float32              `json:"carbon_estimate,omitempty"`
 	CurrentCarbon  float32              `json:"current_estimate,omitempty"`
 	AccountCreated time.Time            `json:"account_created,omitempty"`
+	Followers      []string             `json:"followers,omitempty"`
+	Following      []string             `json:"following,omitempty"`
+	IsSecret       bool                 `json:"is_secret,omitempty"`
 }

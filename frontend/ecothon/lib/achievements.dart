@@ -12,6 +12,6 @@ class _AchievementsPageState extends State<AchievementsPage> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        child: Text("This is the settings page"));
+        child: Text("ME NOT ACHIEVE MUCH :("));
   }
 }
