@@ -4,18 +4,33 @@ import 'package:flutter/material.dart';
 import 'package:ecothon/achievements.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
-import 'settings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:ecothon/feed.dart';
+import 'settings.dart';
 
-main() {
+main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  GeneralStore store = GeneralStore();
+  final storage = new FlutterSecureStorage();
+
+  bool isLoggedIn = await storage.containsKey(key: "username") &&
+      await storage.containsKey(key: "token");
+
+  String username = await storage.read(key: "username");
+  String token = await storage.read(key: "token");
+  store.setLoginData(username, token);
+
   runApp(ChangeNotifierProvider(
-    create: (context) => GeneralStore(),
-    child: MyApp(),
+    create: (context) => store,
+    child: MyApp(isLoggedIn: isLoggedIn),
   ));
 }
 
 class MyApp extends StatelessWidget {
+  final bool isLoggedIn;
+
+  const MyApp({Key key, this.isLoggedIn}) : super(key: key);
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -25,7 +40,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.green,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(),
+      home: (isLoggedIn ? MyHomePage() : LoginPage()),
     );
   }
 }
@@ -38,9 +53,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  bool _loggedIn = false;
   int _selectedIndex = 0;
-  int _number = 0;
   var _navBarItems = const <BottomNavigationBarItem>[
     BottomNavigationBarItem(
       icon: Icon(Icons.messenger_rounded),
@@ -51,8 +64,8 @@ class _MyHomePageState extends State<MyHomePage> {
       label: 'Achievements',
     ),
     BottomNavigationBarItem(
-      icon: Icon(Icons.settings),
-      label: 'Settings',
+      icon: Icon(Icons.person),
+      label: 'Profile',
     ),
   ];
 
@@ -69,7 +82,6 @@ class _MyHomePageState extends State<MyHomePage> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
-      _number = index;
       _controller.jumpToPage(index);
     });
   }
@@ -77,68 +89,38 @@ class _MyHomePageState extends State<MyHomePage> {
   void _onPagedChanged(int index) {
     setState(() {
       _selectedIndex = index;
-      _number = index;
     });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    loggedIn(); //running initialisation code; getting prefs etc.
   }
 
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
         onWillPop: () async {
-          if (_number != 0) {
-            _onItemTapped(0);
+          if (_selectedIndex != 1) {
+            _onItemTapped(1);
             return false;
           }
           return true;
         },
-        child: _loggedIn
-            ? Scaffold(
-                appBar: AppBar(
-                  title: Text(_navBarItems[_selectedIndex].label),
-                ),
-                body: PageView(
-                  controller: _controller,
-                  onPageChanged: _onPagedChanged,
-                  children: [
-                    FeedPage(),
-                    AchievementsPage(),
-                    ProfilePage(),
-                  ],
-                ),
-                bottomNavigationBar: BottomNavigationBar(
-                  items: _navBarItems,
-                  currentIndex: _selectedIndex,
-                  selectedItemColor: Colors.green[800],
-                  onTap: _onItemTapped,
-                ),
-              )
-            : Scaffold(
-                appBar: AppBar(
-                  title: Text("Login"),
-                ),
-                body: LoginPage()));
-  }
-
-  Future<void> loggedIn() async {
-    final storage = new FlutterSecureStorage();
-    if (await storage.containsKey(key: "username") &&
-        await storage.containsKey(key: "token")) {
-      String username = await storage.read(key: "username");
-      String token = await storage.read(key: "token");
-      Provider.of<GeneralStore>(context).setLoginData(username, token);
-      setState(() {
-        _loggedIn = true;
-      });
-      return;
-    }
-    setState(() {
-      _loggedIn = false;
-    });
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(_navBarItems[_selectedIndex].label),
+          ),
+          body: PageView(
+            controller: _controller,
+            onPageChanged: _onPagedChanged,
+            children: [
+              FeedPage(),
+              AchievementsPage(),
+              ProfilePage(),
+            ],
+          ),
+          bottomNavigationBar: BottomNavigationBar(
+            items: _navBarItems,
+            currentIndex: _selectedIndex,
+            selectedItemColor: Colors.green[800],
+            onTap: _onItemTapped,
+          ),
+        ));
   }
 }

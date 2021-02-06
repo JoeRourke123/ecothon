@@ -1,6 +1,7 @@
 package models
 
 import (
+	"go.mongodb.org/mongo-driver/bson"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -13,8 +14,7 @@ type User struct {
 	Username       string               `json:"username,omitempty"`
 	Email          string               `json:"email,omitempty"`
 	Password       string               `json:"password,omitempty,secret"`
-	LikedPosts     []primitive.ObjectID `json:"liked_posts"`
-	Achievements   []primitive.ObjectID `json:"achievements"`
+	Achievements   []bson.M `json:"achievements"`
 	Points         int16                `json:"points"`
 	StartingCarbon float32              `json:"carbon_estimate,omitempty"`
 	CurrentCarbon  float32              `json:"current_estimate,omitempty"`
