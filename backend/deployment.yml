@@ -25,3 +25,13 @@ spec:
             secretKeyRef:
               name: database-secrets
               key: ECOTHON_DB_PASS
+        - name: ECOTHON_SPACES_KEY
+          valueFrom:
+            secretKeyRef:
+              name: database-secrets
+              key: ECOTHON_SPACES_KEY
+        - name: ECOTHON_SPACES_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: database-secrets
+              key: ECOTHON_SPACES_SECRET
