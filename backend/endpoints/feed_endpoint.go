@@ -1,7 +1,6 @@
 package endpoints
 
 import (
-	"ecothon/models"
 	"ecothon/utils"
 	"encoding/json"
 	"github.com/gofiber/fiber/v2"
@@ -17,30 +16,27 @@ func GetFeed(c *fiber.Ctx) error {
 		return fiber.ErrInternalServerError
 	}
 
-	var loc models.Location
+	var loc bson.M
 	json.Unmarshal([]byte(c.Body()), &loc)
 
-	filter := bson.D{
-		{"location",
-			bson.D{
-				{"$near", bson.D{
-					{"$geometry", loc},
-					{"$maxDistance", MAX_DISTANCE},
-				}},
-			}},
-		{
-
+	filter := bson.M{
+		"geolocation":
+		bson.M{
+			"$nearSphere": bson.M{
+				"$geometry": loc,
+				"$maxDistance": MAX_DISTANCE},
 		},
 	}
 
 	options := options2.Find()
-	options.SetSort(bson.D{{"created_at", -1}})
+	options.SetSort(bson.D{{"createdat", -1}})
 	options.SetLimit(50)
 
 	var results []bson.M
 	cur, err := collection.Find(c.Context(), filter, options)
 
 	if err != nil {
+		print(err.Error())
 		return fiber.ErrInternalServerError
 	}
 	if cur != nil {
