@@ -27,7 +27,7 @@ class _LoginPageState extends State<LoginPage> {
           .showSnackBar(SnackBar(content: Text("Processing")));
       try {
         http.Response res = await http
-            .post("http://192.168.0.24:3000/api/auth/login", body: jsonEncode({
+            .post("http://ecothon.space/api/auth/login", body: jsonEncode({
           "email": _emailController.text,
           "password": _passwordController.text
         }));
