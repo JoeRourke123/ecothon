@@ -1,0 +1,57 @@
+[
+  {
+	"title": "Eat a vegan meal",
+	"carbonreduction": 2.1,
+	"description": "Swap out the meat for veggies, tofu, and beans! Fun fact: a study found that 10,000 people eating vegan for a week saved enough CO2 to fly to the moon and back!",
+	"repeating": true,
+	"points": 10,
+	"achievedby": [],
+	"details": {
+	  "choices": [{
+		"title": "Oat Milk"
+	  }, { "title": "Soy Milk"}, { "title":  "Almond Milk"}, {"title": "Coconut Milk"}, {"title":  "Other"}]
+	}
+  },
+  {
+	"title": "Switch to reusable straws",
+	"carbonreduction": 0.03,
+	"description": "While taking more greenhouse gases to produce than plastic straws - they last (pretty much) forever. You need ~150 uses of your metal straw to count for one plastic straw.",
+	"repeating": false,
+	"points": 20,
+	"achievedby": [],
+	"details": {
+	  "choices": [{"title": "Metal Straws"}, {"title": "Glass Straws"}]
+	}
+  },
+  {
+	"title": "Use a tote bag when shopping",
+	"carbonreduction": 0.05,
+	"description": "Using a tote bag keeps plastic out of landfill - however you must use it lots to recoup the large manufacturing emissions of cotton yarn!",
+	"repeating": false,
+	"points": 25,
+	"achievedby": [],
+	"details": {}
+  },
+  {
+	"title": "Buying second hand clothes",
+	"carbonreduction": 100,
+	"description": "Buying second hand spreads out the carbon footprint of clothing. You can end up with way more unique outfits by going to vintage stores, charity shops, using second hand apps etc. The clothing industry is one of the worst offenders in the climate crisis",
+	"repeating": true,
+	"points": 30,
+	"achievedby": [],
+	"details": {
+	  "useful_links": ["https://depop.com", "https://vinted.com", "https://www.timeout.com/london/shopping/londons-nine-best-thrift-stores"]
+	}
+  },
+  {
+	"title": "Bars over bottles!",
+	"carbonreduction": 6.2,
+	"description": "Bars come in more eco-friendly packaging, last for ages, and produce nearly no waste! They come in all kinds of great scents, shapes, etc!",
+	"repeating": false,
+	"points": 10,
+	"achievedby": [],
+	"details": {
+	  "useful_links": ["https://www.faithinnature.co.uk/", "https://www.psychologies.co.uk/top-5-best-eco-friendly-and-vegan-soap-bars", "https://www.littlesoapcompany.co.uk/product-category/eco-warrior-cleansing-bars/"]
+	}
+  }
+]
