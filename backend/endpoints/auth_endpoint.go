@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
 	"time"
 )
@@ -37,14 +36,24 @@ func CreateUser(c *fiber.Ctx) error {
 	var user models.User
 	json.Unmarshal([]byte(c.Body()), &user)
 
-	user.AccountCreated = time.Now()
+	cur, err := collection.Find(c.Context(), bson.D{{ "username", user.Username}})
+	if cur.RemainingBatchLength() > 0 {
+		return c.JSON(bson.M{ "error": "An account with that username already exists! "})
+	}
 
-	if user.LikedPosts == nil {
-		user.LikedPosts = []primitive.ObjectID{}
+	cur, err = collection.Find(c.Context(), bson.D{{ "email", user.Email}})
+	if cur.RemainingBatchLength() > 0 {
+		return c.JSON(bson.M{ "error": "An account with that email already exists! "})
 	}
-	if user.LikedPosts == nil {
-		user.LikedPosts = []primitive.ObjectID{}
-	}
+
+	user.AccountCreated = time.Now()
+	user.Points = 0
+
+	user.Achievements = []bson.M{}
+	user.Followers = []string{}
+	user.Following = []string{}
+
+	user.CurrentCarbon = user.StartingCarbon
 
 	user.Password = generateHash([]byte(user.Password))
 
@@ -97,13 +106,13 @@ func LoginUser(ctx *fiber.Ctx) error {
 	return ctx.JSON(
 		&responses.AuthResponse{
 			User: &responses.UserResponse{
-				Email: user.Email,
-				Username: user.Username,
-				FirstName: user.FirstName,
-				LastName: user.LastName,
+				Email:          user.Email,
+				Username:       user.Username,
+				FirstName:      user.FirstName,
+				LastName:       user.LastName,
 				AccountCreated: user.AccountCreated,
 				StartingCarbon: user.StartingCarbon,
-				CurrentCarbon: user.CurrentCarbon,
+				CurrentCarbon:  user.CurrentCarbon,
 			},
 			Auth: &t,
 		},
@@ -131,7 +140,7 @@ func UserProfile(c *fiber.Ctx) error {
 
 	return c.JSON(bson.M{
 		"following": isFollowing,
-		"user": user,
-		"posts": posts,
+		"user":      user,
+		"posts":     posts,
 	})
 }
