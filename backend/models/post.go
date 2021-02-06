@@ -3,6 +3,7 @@ package models
 import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"time"
 )
 
 type Location struct {
@@ -19,4 +20,5 @@ type Post struct {
 	LikedBy     []primitive.ObjectID `json:"liked_by"`
 	Geolocation Location             `json:"geolocation"`
 	Details     bson.M               `json:"details,omitempty"`
+	CreatedAt   time.Time            `json:"created_at,omitempty"`
 }
