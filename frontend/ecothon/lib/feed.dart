@@ -17,27 +17,40 @@ class _FeedPageState extends State<FeedPage> {
         appBar: AppBar(
           title: Text("Feed"),
         ),
-        body: ListView.builder(
+        body: ListView.separated(
+          padding: EdgeInsets.all(8),
           itemCount: Provider.of<FeedStore>(context).feedItemData.length,
-            itemBuilder: (context, index) {
-          return Consumer<FeedStore>(
-            builder: (context, feed, child) {
-              String text = feed.feedItemData[index].text;
-              return FeedItem(text: text);
-            },
-          );
-        }));
+          itemBuilder: (context, index) {
+            return Consumer<FeedStore>(
+              builder: (context, feed, child) {
+                String text = feed.feedItemData[index].text;
+                return FeedItem(text: text);
+              },
+            );
+          },
+          separatorBuilder: (BuildContext context, int index) =>
+              const Divider(),
+        ));
   }
 }
 
 class FeedItem extends StatelessWidget {
   final String text;
+
   FeedItem({Key key, this.text}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: Text(this.text),
+      padding: EdgeInsets.all(8),
+      child: Center(child: Text(this.text)),
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Colors.blueAccent,
+        ),
+        borderRadius: BorderRadius.all(Radius.circular(20)),
+        color: Colors.lightBlue,
+      ),
     );
   }
 }
