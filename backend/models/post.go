@@ -12,13 +12,14 @@ type Location struct {
 }
 
 type Post struct {
-	_id         primitive.ObjectID   `json:"id,omitempty"`
-	User        primitive.ObjectID   `json:"user"`
-	Achievement primitive.ObjectID   `json:"achievement,omitempty"`
-	Type        string               `json:"type,omitempty"`
-	Comments    []bson.M             `json:"comments,omitempty"`
-	LikedBy     []primitive.ObjectID `json:"liked_by"`
-	Geolocation Location             `json:"geolocation"`
-	Details     bson.M               `json:"details,omitempty"`
-	CreatedAt   time.Time            `json:"created_at,omitempty"`
+	_id         primitive.ObjectID `json:"id,omitempty"`
+	User        string             `json:"user"`
+	Picture     string             `json:"picture,omitempty"`
+	Achievement primitive.ObjectID `json:"achievement,omitempty"`
+	Type        string             `json:"type,omitempty"`
+	Comments    []bson.M           `json:"comments,omitempty"`
+	LikedBy     []string           `json:"liked_by"`
+	Geolocation Location           `json:"geolocation"`
+	Details     bson.M             `json:"details,omitempty"`
+	CreatedAt   time.Time          `json:"created_at,omitempty"`
 }

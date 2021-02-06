@@ -5,6 +5,8 @@ import (
 	"ecothon/utils"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"time"
 )
 
 func GetCompletedAchievements(c *fiber.Ctx) error {
@@ -102,4 +104,20 @@ func GetAllAchievements(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(results)
+}
+
+func DoAchievement(c *fiber.Ctx) error {
+	var user models.User
+	utils.GetUser(c.Locals("USER").(string), c, &user)
+
+	username := c.Locals("USER").(string)
+	achievementID, _ := primitive.ObjectIDFromHex(c.Params("id"))
+
+	err := utils.AddUserAchievement(username, primitive.NilObjectID, achievementID, c, time.Now())
+
+	if err != nil {
+		return err
+	}
+
+	return c.SendStatus(201)
 }

@@ -81,7 +81,7 @@ func LoginUser(ctx *fiber.Ctx) error {
 	cur := collection.FindOne(ctx.Context(), &filter)
 
 	if cur.Err() != nil {
-		return ctx.Status(404).JSON(map[string]string{"error": "We can't find an account with that email!"})
+		return ctx.Status(403).JSON(map[string]string{"error": "We can't find an account with that email!"})
 	}
 
 	cur.Decode(&user)

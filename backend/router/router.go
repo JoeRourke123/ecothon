@@ -26,7 +26,7 @@ func SetupRoutes(app *fiber.App) {
 	achievements.Get("/complete", middleware.Auth, endpoints.GetCompletedAchievements)
 	achievements.Get("/incomplete", middleware.Auth, endpoints.GetIncompletedAchievements)
 	achievements.Get("/all", middleware.Auth, endpoints.GetAllAchievements)
-	//achievements.Get("/done", middleware.Protected(), endpoints.DoAchievement)
+	achievements.Post("/:id/done", middleware.Auth, endpoints.DoAchievement)
 
 	//// Auth
 	//auth := api.Group("/auth")
