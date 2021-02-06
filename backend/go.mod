@@ -3,6 +3,7 @@ module ecothon
 go 1.15
 
 require (
+	github.com/aws/aws-sdk-go v1.29.15
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gofiber/fiber/v2 v2.4.1
 	github.com/klauspost/compress v1.11.0 // indirect

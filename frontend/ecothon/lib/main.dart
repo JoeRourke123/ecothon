@@ -13,12 +13,12 @@ main() async {
   GeneralStore store = GeneralStore();
   final storage = new FlutterSecureStorage();
 
-  bool isLoggedIn = await storage.containsKey(key: "username") &&
-      await storage.containsKey(key: "token");
-
-  String username = await storage.read(key: "username");
-  String token = await storage.read(key: "token");
-  store.setLoginData(username, token);
+  bool isLoggedIn = await storage.containsKey(key: "username") && await storage.containsKey(key: "token");
+  if (isLoggedIn) {
+    String username = await storage.read(key: "username");
+    String token = await storage.read(key: "token");
+    store.setLoginData(username, token);
+  }
 
   runApp(ChangeNotifierProvider(
     create: (context) => store,
@@ -64,8 +64,8 @@ class _MyHomePageState extends State<MyHomePage> {
       label: 'Achievements',
     ),
     BottomNavigationBarItem(
-      icon: Icon(Icons.settings),
-      label: 'Settings',
+      icon: Icon(Icons.person),
+      label: 'Profile',
     ),
   ];
 

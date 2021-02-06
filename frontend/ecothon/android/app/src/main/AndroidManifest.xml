@@ -9,8 +9,10 @@
     <application
         android:name="io.flutter.app.FlutterApplication"
         android:label="ecothon"
-        android:icon="@mipmap/ic_launcher">
-        <activity
+        android:icon="@mipmap/ic_launcher"
+        android:allowBackup="false"
+        android:fullBackupContent="@xml/my_backup_rules">
+    <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"
