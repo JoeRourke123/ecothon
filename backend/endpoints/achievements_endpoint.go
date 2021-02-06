@@ -10,7 +10,8 @@ import (
 
 func GetCompletedAchievements(c *fiber.Ctx) error {
 		var user models.User
-		utils.GetUser(c.Params("id"), c, &user)
+		var user_id string = c.Locals("USER").(string)
+		utils.GetUser(user_id, c, &user)
 
 		collection, err := utils.GetMongoDbCollection("achievements")
 
@@ -40,7 +41,8 @@ func GetCompletedAchievements(c *fiber.Ctx) error {
 
 func GetIncompletedAchievements(c *fiber.Ctx) error {
 	var user models.User
-	utils.GetUser(c.Params("id"), c, &user)
+	var user_id string = c.Locals("USER").(string)
+	utils.GetUser(user_id, c, &user)
 
 	collection, err := utils.GetMongoDbCollection("achievements")
 

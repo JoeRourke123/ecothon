@@ -4,18 +4,16 @@ import (
 	"ecothon/models"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func GetUser(id string, c *fiber.Ctx, user *models.User) {
+func GetUser(username string, c *fiber.Ctx, user *models.User) {
 	collection, err := GetMongoDbCollection("users")
 
-	if id == "" || err != nil {
+	if username == "" || err != nil {
 		return
 	}
 
-	objID, _ := primitive.ObjectIDFromHex(id)
-	filter := bson.M{"_id": objID}
+	filter := bson.M{"username": username}
 
 	cur := collection.FindOne(c.Context(), filter)
 

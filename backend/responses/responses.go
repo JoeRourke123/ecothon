@@ -1,21 +1,27 @@
-package models
+package responses
 
 import (
 	"time"
-
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type User struct {
-	_id            primitive.ObjectID   `json:"id,omitempty"`
+// UserResponse todo
+type UserResponse struct {
 	FirstName      string               `json:"first_name,omitempty"`
 	LastName       string               `json:"last_name,omitempty"`
 	Username       string               `json:"username,omitempty"`
 	Email          string               `json:"email,omitempty"`
-	Password       string               `json:"password,omitempty,secret"`
-	LikedPosts     []primitive.ObjectID `json:"liked_posts"`
-	Achievements   []primitive.ObjectID `json:"achievements"`
 	StartingCarbon float32              `json:"carbon_estimate,omitempty"`
 	CurrentCarbon  float32              `json:"current_estimate,omitempty"`
 	AccountCreated time.Time            `json:"account_created,omitempty"`
+}
+
+// AccessResponse todo
+type AccessResponse struct {
+	Token string `json:"token"`
+}
+
+// AuthResponse todo
+type AuthResponse struct {
+	User *UserResponse   `json:"user"`
+	Auth *string `json:"auth"`
 }

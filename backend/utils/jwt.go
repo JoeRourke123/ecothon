@@ -13,7 +13,7 @@ const TOKENKEY string = "hello"
 
 // TokenPayload defines the payload for the token
 type TokenPayload struct {
-	ID uint
+	Username string
 }
 
 // Generate generates the jwt token based on payload
@@ -26,7 +26,7 @@ func Generate(payload *TokenPayload) string {
 
 	t := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"exp": time.Now().Add(v).Unix(),
-		"ID":  payload.ID,
+		"Username":  payload.Username,
 	})
 
 	token, err := t.SignedString([]byte(TOKENKEY))
@@ -69,12 +69,12 @@ func Verify(token string) (*TokenPayload, error) {
 	}
 
 	// Getting ID, it's an interface{} so I need to cast it to uint
-	id, ok := claims["ID"].(float64)
+	id, ok := claims["ID"].(string)
 	if !ok {
 		return nil, errors.New("Something went wrong")
 	}
 
 	return &TokenPayload{
-		ID: uint(id),
+		Username: id,
 	}, nil
 }
