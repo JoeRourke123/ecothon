@@ -2,18 +2,30 @@ package router
 
 import (
 	"ecothon/endpoints"
+	"ecothon/middleware"
 
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 )
 
 // SetupRoutes setup router api
 func SetupRoutes(app *fiber.App) {
+	/// API
+	api := app.Group("/api")
+
 	//// Auth
-	auth := app.Group("/auth")
+	auth := api.Group("/auth")
 	auth.Post("/create-user", endpoints.CreateUser)
 
-	// Middleware
-	// api := app.Group("/api")
+	/// Feed
+	posts := api.Group("/posts")
+	posts.Post("/", middleware.Auth, endpoints.GetFeed)
+	//posts.Post("/new-post", middleware.Protected(), endpoints.NewPost)
+
+	achievements := api.Group("/achievements")
+	achievements.Get("/:id/complete", middleware.Auth, endpoints.GetCompletedAchievements)
+	achievements.Get("/:id/incomplete", middleware.Auth, endpoints.GetIncompletedAchievements)
+	achievements.Get("/all", middleware.Auth, endpoints.GetAllAchievements)
+	//achievements.Get("/done", middleware.Protected(), endpoints.DoAchievement)
 
 	//// Auth
 	//auth := api.Group("/auth")
