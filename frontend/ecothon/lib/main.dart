@@ -39,22 +39,22 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
-  int _selectedIndex = 0;
+  int _selectedIndex = 1;
   int _number = 0;
   var _navBarItems = const <BottomNavigationBarItem>[
     BottomNavigationBarItem(
-      icon: Icon(Icons.messenger_rounded),
-      label: 'Feed',
+      icon: Icon(Icons.star),
+      label: 'Achievements',
       backgroundColor: Colors.blue,
     ),
     BottomNavigationBarItem(
-      icon: Icon(Icons.star),
-      label: 'Achievements',
+      icon: Icon(Icons.messenger_rounded),
+      label: 'Feed',
       backgroundColor: Colors.amber,
     ),
     BottomNavigationBarItem(
-      icon: Icon(Icons.settings),
-      label: 'Settings',
+      icon: Icon(Icons.person),
+      label: 'Profile',
       backgroundColor: Colors.amber,
     ),
   ];
@@ -88,8 +88,8 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return WillPopScope(
         onWillPop: () async {
-          if (_number != 0) {
-            _onItemTapped(0);
+          if (_number != 1) {
+            _onItemTapped(1);
             return false;
           }
           return true;
@@ -102,8 +102,8 @@ class _MyHomePageState extends State<MyHomePage> {
             controller: _controller,
             onPageChanged: _onPagedChanged,
             children: [
-              FeedPage(),
               AchievementsPage(),
+              FeedPage(),
               SettingsPage(),
             ],
           ),
