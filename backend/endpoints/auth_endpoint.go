@@ -139,7 +139,7 @@ func UserProfile(c *fiber.Ctx) error {
 		isFollowing = utils.BinarySearch(currentUser.Following, c.Params("username"))
 	}
 
-	var posts []bson.M
+	var posts []models.ReturnPost
 	utils.GetPosts(viewingUsername, &posts, c)
 
 	return c.JSON(bson.M{

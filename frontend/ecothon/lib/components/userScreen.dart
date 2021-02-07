@@ -1,3 +1,4 @@
+import 'package:ecothon/components/feedCard.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -98,9 +99,9 @@ class _UserScreenState extends State<UserScreen> {
       ListView.builder(
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
-        itemCount: 0,
+        itemCount: widget.user["posts"].length,
         itemBuilder: (c, i) {
-          return Container();
+          return FeedCard(data: widget.user["posts"][i]);
         },
       )
     ]));
