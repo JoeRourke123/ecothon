@@ -56,12 +56,30 @@ func CreateUser(c *fiber.Ctx) error {
 
 	user.Password = generateHash([]byte(user.Password))
 
-	res, err := collection.InsertOne(c.Context(), user)
+	_, err = collection.InsertOne(c.Context(), user)
 	if err != nil {
 		return fiber.ErrInternalServerError
 	}
 
-	return c.JSON(res)
+
+	t := utils.Generate(&utils.TokenPayload{
+		Username: user.Username,
+	})
+
+	return c.JSON(
+		&responses.AuthResponse{
+			User: &responses.UserResponse{
+				Email:          user.Email,
+				Username:       user.Username,
+				FirstName:      user.FirstName,
+				LastName:       user.LastName,
+				AccountCreated: user.AccountCreated,
+				StartingCarbon: user.StartingCarbon,
+				CurrentCarbon:  user.CurrentCarbon,
+			},
+			Auth: &t,
+		},
+	)
 }
 
 func LoginUser(ctx *fiber.Ctx) error {
@@ -148,6 +166,8 @@ func UserProfile(c *fiber.Ctx) error {
 	if user.Following == nil {
 		user.Following = make([]string, 0)
 	}
+
+	print(user.Username)
 
 	return c.JSON(bson.M{
 		"following": isFollowing,
