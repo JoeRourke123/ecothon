@@ -23,6 +23,8 @@ class _AchievementsPageState extends State<AchievementsPage> {
     http.Response resp = await http.get(
         "https://ecothon.space/api/achievements/incomplete",
         headers: {"Authorization": "Bearer " + token});
+
+    print(resp.body);
     try {
       List<Map<String, dynamic>> achievements =
           List<Map<String, dynamic>>.from(jsonDecode(resp.body));
