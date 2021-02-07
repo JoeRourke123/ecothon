@@ -6,9 +6,7 @@ on:
     branches:
       - main
     paths:
-      - 'config/**'
-      - 'site/**'
-      - 'Dockerfile'
+      - 'backend/**'
       - '.github/workflows/**'
 
 jobs:
