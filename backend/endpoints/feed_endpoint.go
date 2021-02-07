@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	options2 "go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -52,6 +53,16 @@ func GetFeed(c *fiber.Ctx) error {
 
 	for _, item := range results {
 		item["is_liked"] = utils.BinarySearch(item["likedby"].([]string), username)
+
+		id, _ := primitive.ObjectIDFromHex(item["achievement"].(string))
+
+		cur, _ := collection.Find(c.Context(), bson.M{
+			"_id": id,
+		})
+		var achievement models.Achievement
+		cur.Decode(&achievement)
+
+		item["achievement"] = achievement
 	}
 
 	if results == nil {

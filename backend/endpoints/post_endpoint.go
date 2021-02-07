@@ -30,6 +30,7 @@ func CreatePost(c *fiber.Ctx) error {
 
 	post.Geolocation.Type = "Point"
 	post.CreatedAt = now
+	post.User = username
 
 	if post.Comments == nil {
 		post.Comments = []models.Comment{}
