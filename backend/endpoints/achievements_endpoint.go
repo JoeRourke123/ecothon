@@ -20,11 +20,18 @@ func GetCompletedAchievements(c *fiber.Ctx) error {
 		return fiber.ErrInternalServerError
 	}
 
+	var achievementIDs []primitive.ObjectID
+	achievementIDs = make([]primitive.ObjectID, len(user.Achievements))
+	for i, item := range user.Achievements {
+		b := bson.M(item)
+		achievementIDs[i] = b["achievement"].(primitive.ObjectID)
+	}
+
 	cur, err := collection.Find(c.Context(), bson.D{
 		{
 			"_id",
 			bson.D{
-				{"$in", user.Achievements},
+				{"$in", achievementIDs},
 			},
 		},
 	})
@@ -55,11 +62,28 @@ func GetIncompletedAchievements(c *fiber.Ctx) error {
 		return fiber.ErrInternalServerError
 	}
 
-	cur, err := collection.Find(c.Context(), bson.D{
-		{
-			"_id",
+	var achievementIDs []primitive.ObjectID
+	achievementIDs = make([]primitive.ObjectID, len(user.Achievements))
+	for i, item := range user.Achievements {
+		b := bson.M(item)
+		achievementIDs[i] = b["achievement"].(primitive.ObjectID)
+	}
+
+	cur, err := collection.Find(c.Context(), bson.M{
+		"$or": bson.A{
 			bson.D{
-				{"$nin", user.Achievements},
+				{
+					"_id",
+					bson.D{
+						{"$nin", achievementIDs},
+					},
+				},
+			},
+			bson.D{
+				{
+					"repeating",
+					true,
+				},
 			},
 		},
 	})

@@ -9,6 +9,8 @@ import 'package:flutter/foundation.dart';
 import 'package:ecothon/feed.dart';
 import 'settings.dart';
 
+GlobalKey<ScaffoldState> globalScaffold = GlobalKey<ScaffoldState>();
+
 main() async {
   WidgetsFlutterBinding.ensureInitialized();
   GeneralStore store = GeneralStore();
@@ -105,6 +107,7 @@ class _MyHomePageState extends State<MyHomePage> {
         return true;
       },
       child: Scaffold(
+				key: globalScaffold,
         appBar: AppBar(
           backgroundColor: Colors.white,
           title: Image.asset(
