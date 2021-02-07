@@ -7,7 +7,8 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:ecothon/feed.dart';
-import 'settings.dart';
+import 'profile.dart';
+import 'map.dart';
 
 GlobalKey<ScaffoldState> globalScaffold = GlobalKey<ScaffoldState>();
 
@@ -57,6 +58,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  bool _noSwipe = false;
   int _selectedIndex = 0;
   var _navBarItems = const <BottomNavigationBarItem>[
     BottomNavigationBarItem(
@@ -95,6 +97,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _onPagedChanged(int index) {
+    if (index == 3){
+      _noSwipe = true;
+    } else {
+      _noSwipe = false;
+    }
     setState(() {
       _selectedIndex = index;
     });
@@ -111,7 +118,6 @@ class _MyHomePageState extends State<MyHomePage> {
         return true;
       },
       child: Scaffold(
-				key: globalScaffold,
         appBar: AppBar(
           backgroundColor: Colors.white,
           title: Image.asset(
@@ -127,11 +133,13 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         body: PageView(
           controller: _controller,
+          physics: _noSwipe ? NeverScrollableScrollPhysics() : ClampingScrollPhysics(),
           onPageChanged: _onPagedChanged,
           children: [
             FeedPage(),
             AchievementsPage(),
             ProfilePage(),
+            MapPage(),
           ],
         ),
         bottomNavigationBar: Container(
@@ -172,6 +180,14 @@ class _MyHomePageState extends State<MyHomePage> {
                             text: 'Profile',
                             backgroundColor:
                                 Colors.green.shade800.withOpacity(0.75),
+                            textColor: Colors.white,
+                            iconActiveColor: Colors.white,
+                          ),
+                          GButton(
+                            icon: Icons.map,
+                            text: 'Map',
+                            backgroundColor:
+                            Colors.green.shade800.withOpacity(0.75),
                             textColor: Colors.white,
                             iconActiveColor: Colors.white,
                           ),

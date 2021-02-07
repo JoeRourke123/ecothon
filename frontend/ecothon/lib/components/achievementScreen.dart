@@ -116,12 +116,6 @@ class _AchievementScreenState extends State<AchievementScreen> {
 
 										Navigator.of(context).pop();
 										Loader.hide();
-
-										if(resp.statusCode == 200) {
-											globalScaffold.currentState.showSnackBar(SnackBar(content: Text("Successfully completed!")));
-										} else {
-											globalScaffold.currentState.showSnackBar(SnackBar(content: Text("There was a problem when completing your achievement!")));
-										}
 									}, color: Colors.green.shade600, textColor: Colors.white,),
 									MaterialButton(child: Text("Post"), onPressed: () {
 										Navigator.of(context).push(

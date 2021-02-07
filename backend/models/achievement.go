@@ -7,12 +7,12 @@ import (
 
 type Achievement struct {
 	_id             primitive.ObjectID `json:"id,omitempty"`
-	Title           string             `json:"title,omitempty"`
-	Description     string             `json:"description,omitempty"`
-	CarbonReduction float32            `json:"carbon_reduction,omitempty"`
-	Repeating       bool               `json:"repeating,omitempty"`
-	Points          int8               `json:"points,omitempty"`
+	Title           string             `json:"title"`
+	Description     string             `json:"description"`
+	CarbonReduction float32            `json:"carbon_reduction"`
+	Repeating       bool               `json:"repeating"`
+	Points          int8               `json:"points"`
 	AchievedBy      []bson.M           `json:"achieved_by"`
-	Details         bson.M             `json:"details,omitempty"`
-	ImageURL		string				`json:"image_url,omitempty"`
+	Details         bson.M             `json:"details"`
+	ImageURL		string				`json:"image_url"`
 }

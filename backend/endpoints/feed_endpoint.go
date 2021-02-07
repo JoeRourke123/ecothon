@@ -1,6 +1,7 @@
 package endpoints
 
 import (
+	"ecothon/models"
 	"ecothon/utils"
 	"encoding/json"
 	"github.com/gofiber/fiber/v2"
@@ -11,6 +12,10 @@ import (
 const MAX_DISTANCE int = 10000
 
 func GetFeed(c *fiber.Ctx) error {
+	var user models.User
+	var username string = c.Locals("USER").(string)
+	utils.GetUser(username, c, &user)
+
 	collection, err := utils.GetMongoDbCollection(c, "posts")
 	if err != nil {
 		return fiber.ErrInternalServerError
@@ -32,7 +37,6 @@ func GetFeed(c *fiber.Ctx) error {
 	options.SetSort(bson.D{{"createdat", -1}})
 	options.SetLimit(50)
 
-	var results []bson.M
 	cur, err := collection.Find(c.Context(), filter, options)
 
 	if err != nil {
@@ -43,11 +47,29 @@ func GetFeed(c *fiber.Ctx) error {
 		defer cur.Close(c.Context())
 	}
 
-	cur.All(c.Context(), &results)
-
-	if results == nil {
-		return fiber.ErrNotFound
+	achievementsCollection, err := utils.GetMongoDbCollection(c, "achievements")
+	if err != nil {
+		print(err.Error())
+		return fiber.ErrInternalServerError
 	}
 
-	return c.JSON(results)
+	returnData := make([]models.ReturnPost, cur.RemainingBatchLength())
+	i := 0
+	for cur.Next(c.Context()) {
+		var r models.ReturnPost
+		cur.Decode(&r)
+
+		r.ID = cur.Current.Index(0).Value().ObjectID()
+		r.IsLiked = utils.BinarySearch(r.LikedBy, username)
+
+		aCur := achievementsCollection.FindOne(c.Context(), bson.D{
+			{"_id", r.Achievement},
+		})
+		aCur.Decode(&r.AchievementObj)
+
+		returnData[i] = r
+		i++
+	}
+
+	return c.JSON(returnData)
 }
