@@ -100,9 +100,11 @@ class _CommentScreenState extends State<CommentScreen> {
 																		mainAxisAlignment: MainAxisAlignment.start,
 																		children: [
 																			Text("@" + widget.post.comments[i]["user"], style: TextStyle(fontWeight: FontWeight.bold)),
-																			Padding(
-																				padding: EdgeInsets.only(left: 30),
-																				child: Text(widget.post.comments[i]["comment"])
+																			Expanded(
+																				child: Padding(
+																					padding: EdgeInsets.only(left: 30),
+																					child: Text(widget.post.comments[i]["comment"])
+																				)
 																			)
 																		]
 																	)
