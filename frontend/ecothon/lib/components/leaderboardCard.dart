@@ -102,7 +102,7 @@ class _LeaderboardCardState extends State<LeaderboardCard> {
                   ], borderRadius: BorderRadius.circular(20)),
                 ),
                 Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 5),
+                    padding: EdgeInsets.symmetric(horizontal: 20),
                     child: Text("@" + widget.data["username"],
                         style: TextStyle(
                           fontSize: 15,
