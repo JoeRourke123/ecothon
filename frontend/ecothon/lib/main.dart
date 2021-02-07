@@ -58,6 +58,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  bool _noSwipe = false;
   int _selectedIndex = 0;
   var _navBarItems = const <BottomNavigationBarItem>[
     BottomNavigationBarItem(
@@ -96,6 +97,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _onPagedChanged(int index) {
+    if (index == 3){
+      _noSwipe = true;
+    } else {
+      _noSwipe = false;
+    }
     setState(() {
       _selectedIndex = index;
     });
@@ -128,6 +134,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         body: PageView(
           controller: _controller,
+          physics: _noSwipe ? NeverScrollableScrollPhysics() : ClampingScrollPhysics(),
           onPageChanged: _onPagedChanged,
           children: [
             FeedPage(),
