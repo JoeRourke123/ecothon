@@ -4,6 +4,7 @@ import (
 	"ecothon/models"
 	"ecothon/utils"
 	"encoding/json"
+
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	options2 "go.mongodb.org/mongo-driver/mongo/options"
@@ -25,10 +26,9 @@ func GetFeed(c *fiber.Ctx) error {
 	json.Unmarshal([]byte(c.Body()), &loc)
 
 	filter := bson.M{
-		"geolocation":
-		bson.M{
+		"geolocation": bson.M{
 			"$nearSphere": bson.M{
-				"$geometry": loc,
+				"$geometry":    loc,
 				"$maxDistance": MAX_DISTANCE},
 		},
 	}
@@ -69,6 +69,36 @@ func GetFeed(c *fiber.Ctx) error {
 
 		returnData[i] = r
 		i++
+	}
+
+	return c.JSON(returnData)
+}
+
+func GetAllPoints(c *fiber.Ctx) error {
+	var user models.User
+	var username string = c.Locals("USER").(string)
+	utils.GetUser(username, c, &user)
+
+	collection, err := utils.GetMongoDbCollection(c, "posts")
+	if err != nil {
+		return fiber.ErrInternalServerError
+	}
+
+	filter := bson.M{}
+
+	cur, err := collection.Find(c.Context(), &filter)
+
+	len := cur.RemainingBatchLength()
+
+	returnData := make([]models.Location, len)
+
+	for i := 0; i < len; i++ {
+		cur.Next(c.Context())
+
+		var p models.Post
+		cur.Decode(&p)
+
+		returnData[i] = p.Geolocation
 	}
 
 	return c.JSON(returnData)
