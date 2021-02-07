@@ -17,6 +17,7 @@ func main() {
 	app.Use(logger.New())
 	app.Use(compress.New())
 
+	app.Static("/", "./static")
 	router.SetupRoutes(app)
 
 	log.Fatal(app.Listen(port))
