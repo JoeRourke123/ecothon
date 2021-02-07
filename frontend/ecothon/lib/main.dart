@@ -7,7 +7,7 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:ecothon/feed.dart';
-import 'settings.dart';
+import 'profile.dart';
 
 GlobalKey<ScaffoldState> globalScaffold = GlobalKey<ScaffoldState>();
 

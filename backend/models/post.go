@@ -12,7 +12,7 @@ type Location struct {
 }
 
 type Comment struct {
-	User        string  `json:"user,omitempty"`
+	User        string    `json:"user,omitempty"`
 	Comment     string    `json:"comment,omitempty"`
 	CommentedAt time.Time `json:"commented_at,omitempty"`
 }
@@ -28,4 +28,19 @@ type Post struct {
 	Geolocation Location           `json:"geolocation"`
 	Details     bson.M             `json:"details,omitempty"`
 	CreatedAt   time.Time          `json:"created_at,omitempty"`
+}
+
+type ReturnPost struct {
+	_id            primitive.ObjectID `json:"id,omitempty"`
+	User           string             `json:"user"`
+	Picture        string             `json:"picture,omitempty"`
+	AchievementObj Achievement        `json:"achievement,omitempty"`
+	Achievement    primitive.ObjectID `json:"achievement_id,omitempty"`
+	Type           string             `json:"type,omitempty"`
+	Comments       []Comment          `json:"comments,omitempty"`
+	LikedBy        []string           `json:"liked_by"`
+	IsLiked        bool               `json:"is_liked"`
+	Geolocation    Location           `json:"geolocation"`
+	Details        bson.M             `json:"details,omitempty"`
+	CreatedAt      time.Time          `json:"created_at,omitempty"`
 }
