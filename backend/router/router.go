@@ -33,6 +33,7 @@ func SetupRoutes(app *fiber.App) {
 	//// Upload image
 	upload := api.Group("/upload")
 	upload.Post("/generate-url", middleware.Auth, endpoints.CreateUploadURL)
+	upload.Post("/image", middleware.Auth, endpoints.UploadImage)
 
 	//// Auth
 	//auth := api.Group("/auth")

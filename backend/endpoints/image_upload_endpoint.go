@@ -70,3 +70,43 @@ func CreateUploadURL(c *fiber.Ctx) error {
 
 	return c.Send([]byte(buf.Bytes()))
 }
+
+// UploadImage uploads an image to S3 directly, i.e. not doing it client side
+func UploadImage(c *fiber.Ctx) error {
+	var user models.User
+	var username string = c.Locals("USER").(string)
+	utils.GetUser(username, c, &user)
+
+	fmt.Println(string(c.Request().Header.ContentType()))
+
+	key := os.Getenv("ECOTHON_SPACES_KEY")
+	secret := os.Getenv("ECOTHON_SPACES_SECRET")
+
+	s3Config := &aws.Config{
+		Credentials: credentials.NewStaticCredentials(key, secret, ""),
+		Endpoint:    aws.String("https://fra1.digitaloceanspaces.com"),
+		Region:      aws.String("fra1"),
+	}
+
+	newSession := session.New(s3Config)
+	s3Client := s3.New(newSession)
+
+	ext := strings.Split(string(c.Request().Header.ContentType()), "/")[1]
+
+	filename := fmt.Sprintf("%s-%s.%s", user.Username, strconv.FormatInt(time.Now().Unix(), 10), ext)
+
+	object := s3.PutObjectInput{
+		Bucket:      aws.String("ecothon"),
+		Key:         aws.String(filename),
+		Body:        bytes.NewReader(c.Body()),
+		ACL:         aws.String("public-read"),
+		ContentType: aws.String(string(c.Request().Header.ContentType())),
+	}
+
+	_, err := s3Client.PutObject(&object)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	return c.JSON(map[string]string{"url": "https://ecothon.fra1.digitaloceanspaces.com/" + filename})
+}
