@@ -7,8 +7,14 @@ import (
 )
 
 type Location struct {
-	Type        string    `json:"type" bson:"type"`
+	Type        string `json:"type" bson:"type"`
 	Coordinates bson.A `json:"coordinates" bson:"coordinates"`
+}
+
+type Comment struct {
+	User        string  `json:"user,omitempty"`
+	Comment     string    `json:"comment,omitempty"`
+	CommentedAt time.Time `json:"commented_at,omitempty"`
 }
 
 type Post struct {
@@ -17,7 +23,7 @@ type Post struct {
 	Picture     string             `json:"picture,omitempty"`
 	Achievement primitive.ObjectID `json:"achievement,omitempty"`
 	Type        string             `json:"type,omitempty"`
-	Comments    []bson.M           `json:"comments,omitempty"`
+	Comments    []Comment          `json:"comments,omitempty"`
 	LikedBy     []string           `json:"liked_by"`
 	Geolocation Location           `json:"geolocation"`
 	Details     bson.M             `json:"details,omitempty"`

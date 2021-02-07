@@ -1,16 +1,22 @@
 package endpoints
 
 import (
+	"ecothon/models"
 	"ecothon/utils"
 	"encoding/json"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	options2 "go.mongodb.org/mongo-driver/mongo/options"
 )
 
 const MAX_DISTANCE int = 10000
 
 func GetFeed(c *fiber.Ctx) error {
+	var user models.User
+	var username string = c.Locals("USER").(string)
+	utils.GetUser(username, c, &user)
+
 	collection, err := utils.GetMongoDbCollection(c, "posts")
 	if err != nil {
 		return fiber.ErrInternalServerError
@@ -44,6 +50,20 @@ func GetFeed(c *fiber.Ctx) error {
 	}
 
 	cur.All(c.Context(), &results)
+
+	for _, item := range results {
+		item["is_liked"] = utils.BinarySearch(item["likedby"].([]string), username)
+
+		id, _ := primitive.ObjectIDFromHex(item["achievement"].(string))
+
+		cur, _ := collection.Find(c.Context(), bson.M{
+			"_id": id,
+		})
+		var achievement models.Achievement
+		cur.Decode(&achievement)
+
+		item["achievement"] = achievement
+	}
 
 	if results == nil {
 		return fiber.ErrNotFound
