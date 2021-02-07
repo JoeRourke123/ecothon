@@ -77,7 +77,10 @@ class _PostPageState extends State<PostPage> {
         Position position = await geolocator.getCurrentPosition(
             desiredAccuracy: LocationAccuracy.best);
 
-        data["geolocation"] = {"type": "Point", "coordinates": [position.longitude, position.latitude]};
+        data["geolocation"] = {
+          "type": "Point",
+          "coordinates": [position.longitude, position.latitude]
+        };
         data["details"] = {"caption": _detailsController.text};
         data["achievement"] = achievement["_id"];
         print(jsonEncode(data));
@@ -141,11 +144,25 @@ class _PostPageState extends State<PostPage> {
                 onPressed: () async {
                   PickedFile file =
                       await ImagePicker().getImage(source: ImageSource.camera);
+                      setState(() {});
                   image = File(file.path);
                 },
                 child: Text("Take photo"),
               )
             ],
+          ),
+          Container(
+            height: 200.0,
+            width: 200.0,
+            alignment: Alignment.topCenter,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: image != null ? Image.file(image).image
+                    : AssetImage('assets/images/shrek.jpg'),
+                fit: BoxFit.contain,
+              ),
+              shape: BoxShape.rectangle,
+            ),
           ),
           Form(
             key: _formKey,
