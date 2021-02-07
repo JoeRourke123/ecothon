@@ -141,7 +141,7 @@ class _FeedCardState extends State<FeedCard> {
                                     vertical: 4, horizontal: 10),
                               )),
                           Padding(
-                            padding: EdgeInsets.only(left: 20),
+                            padding: EdgeInsets.only(left: 10),
                             child: Icon(Icons.more_horiz_rounded, size: 28),
                           )
                         ]),

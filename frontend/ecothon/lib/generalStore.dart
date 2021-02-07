@@ -7,7 +7,7 @@ class GeneralStore extends ChangeNotifier {
   final storage = new FlutterSecureStorage();
   String username;
   String token;
-  List<FeedItemData> feedItemData = [];
+  List<FeedItemData> feedItemData;
   List<Map<String, dynamic>> achievementData = [];
   LatLng mapPos;
   double mapZoom;

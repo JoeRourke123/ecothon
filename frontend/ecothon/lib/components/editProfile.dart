@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:ecothon/login.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
@@ -63,7 +65,18 @@ class _EditProfileState extends State<EditProfileMenu> {
             child: Column(children: [Icon(Icons.photo), Text("From Gallery")])),
       ]),
       SizedBox(height: 15),
-      Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+      Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+				FlatButton(
+					color: Colors.red.shade400,
+					textColor: Colors.white,
+					child: Text("Logout"),
+					onPressed: () async {
+						FlutterSecureStorage storage = FlutterSecureStorage();
+						await storage.deleteAll();
+
+						Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => LoginPage()), (route) => true);
+					},
+				),
         FlatButton(
           color: Colors.green.shade400,
           textColor: Colors.white,

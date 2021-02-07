@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:ecothon/components/feedCard.dart';
 import 'package:flutter/material.dart';
 import 'package:ecothon/generalStore.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:geolocator/geolocator.dart';
@@ -18,6 +19,7 @@ class FeedPage extends StatefulWidget {
 class _FeedPageState extends State<FeedPage>
     with AutomaticKeepAliveClientMixin<FeedPage> {
   bool err = false;
+  bool loading = true;
 
   @override
   void initState() {
@@ -28,23 +30,25 @@ class _FeedPageState extends State<FeedPage>
   @override
   Widget build(BuildContext context) {
     return Container(
-        child: RefreshIndicator(
-            onRefresh: _pullRefresh,
-            child: ListView.separated(
-              padding: EdgeInsets.all(8),
-              itemCount: Provider.of<GeneralStore>(context).feedItemData.length,
-              itemBuilder: (context, index) {
-                return Consumer<GeneralStore>(
-                  builder: (context, feed, child) {
-                    return FeedCard(
-                      data: feed.feedItemData[index],
-                    );
-                  },
-                );
-              },
-              separatorBuilder: (BuildContext context, int index) =>
-                  const Divider(),
-            )));
+        child: Center(
+					child: Provider.of<GeneralStore>(context).feedItemData == null ? SpinKitFoldingCube(color: Colors.green.shade400) : RefreshIndicator(
+						onRefresh: _pullRefresh,
+						child: ListView.separated(
+							padding: EdgeInsets.all(8),
+							itemCount: Provider.of<GeneralStore>(context).feedItemData.length,
+							itemBuilder: (context, index) {
+								return Consumer<GeneralStore>(
+									builder: (context, feed, child) {
+										return FeedCard(
+											data: feed.feedItemData[index],
+										);
+									},
+								);
+							},
+							separatorBuilder: (BuildContext context, int index) =>
+							const Divider(),
+						))
+				));
   }
 
   Future<void> _pullRefresh() async {
