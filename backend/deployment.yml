@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: application
-        image: registry.digitalocean.com/ecothon/ecothon
+        image: <IMAGE>
         imagePullPolicy: Always
         ports:
           - containerPort: 3000
