@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:ecothon/components/achievementCard.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
@@ -24,6 +26,8 @@ class _AchievementsPageState extends State<AchievementsPage> {
     try {
       List<Map<String, dynamic>> achievements =
           List<Map<String, dynamic>>.from(jsonDecode(resp.body));
+
+      print(achievements);
       return achievements;
     } catch (e) {
       print(e);
@@ -42,47 +46,7 @@ class _AchievementsPageState extends State<AchievementsPage> {
               return ListView.builder(
                 shrinkWrap: true,
                 itemCount: snapshot.data.length,
-                itemBuilder: (c, i) => Container(
-                    margin: EdgeInsets.all(20),
-                    padding: EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                              color: Colors.black26,
-                              offset: Offset(2, 2),
-                              blurRadius: 8,
-                              spreadRadius: 2)
-                        ]),
-                    child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(
-                              child: Text(snapshot.data[i]["title"],
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ))),
-                          Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 20),
-                              child: Container(
-                                alignment: Alignment.center,
-                                child: Row(children: [
-                                  Icon(Icons.park, color: Colors.white.withOpacity(0.8)),
-                                  Text(snapshot.data[i]["points"].toString(),
-                                      style: TextStyle(color: Colors.white))
-                                ]),
-                                decoration: BoxDecoration(
-                                    color: Colors.green.shade400,
-                                    borderRadius: BorderRadius.circular(360)),
-                                padding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-                              )),
-                          Padding(
-                            padding: EdgeInsets.only(left: 20),
-                            child: Icon(Icons.chevron_right, size: 28),
-                          )
-                        ])),
+                itemBuilder: (c, i) => AchievementCard(achievement: snapshot.data[i],),
               );
             } else {
               return Center(child: Text("Loading"));

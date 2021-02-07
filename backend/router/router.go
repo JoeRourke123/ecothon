@@ -22,7 +22,7 @@ func SetupRoutes(app *fiber.App) {
 	/// Feed
 	posts := api.Group("/posts")
 	posts.Post("", middleware.Auth, endpoints.GetFeed)
-	//posts.Post("/new-post", middleware.Protected(), endpoints.NewPost)
+	posts.Post("/create", middleware.Auth, endpoints.CreatePost)
 
 	achievements := api.Group("/achievements")
 	achievements.Get("/complete", middleware.Auth, endpoints.GetCompletedAchievements)

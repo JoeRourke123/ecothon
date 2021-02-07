@@ -30,31 +30,34 @@ class _PostPageState extends State<PostPage> {
   File image;
 
   void _post() async {
+  	String token = Provider.of<GeneralStore>(context, listen: false).token;
     Map<String, dynamic> data = {};
     String type = "achievement";
     if (image != null) {
       type += " with a photo";
       http.Response res = await http.post(
-          "https://ecothon.space/api/upload/generate_url",
+          "https://ecothon.space/api/upload/generate-url",
+          headers: {"Authorization": "Bearer " + token},
           body: jsonEncode({"extension": image.path.split('.').last}));
       if (res.statusCode == 200) {
         var url = jsonDecode(res.body)["presigned_url"];
         var final_url = jsonDecode(res.body)["final_url"];
         http.Response res2 =
             await http.put(url, body: await image.readAsBytes());
+        print(res2.body);
         if (res2.statusCode == 200) {
           _scaffoldKey.currentState
               .showSnackBar(SnackBar(content: Text("Image uploaded")));
         } else {
-          String err;
-          try {
-            err = jsonDecode(res.body)["error"];
-          } catch (Exception) {
-            err = jsonDecode(res.reasonPhrase);
-          } finally {
-            _scaffoldKey.currentState
-                .showSnackBar(SnackBar(content: Text(err)));
-          }
+          dynamic decoded = jsonDecode(res.body);
+
+          if(decoded is Map && decoded["error"] != null) {
+						_scaffoldKey.currentState
+							.showSnackBar(SnackBar(content: Text(decoded["error"])));
+					} else {
+						_scaffoldKey.currentState
+							.showSnackBar(SnackBar(content: Text(res.reasonPhrase)));
+					}
         }
         data["picture"] = final_url;
       } else {
@@ -64,8 +67,10 @@ class _PostPageState extends State<PostPage> {
         } catch (Exception) {
           err = jsonDecode(res.reasonPhrase);
         } finally {
+        	print(err);
           _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(err)));
         }
+        return;
       }
     }
     data["type"] = type;
@@ -81,22 +86,24 @@ class _PostPageState extends State<PostPage> {
         data["details"] = _detailsController.text;
         data["achievement"] = achievement["id"];
 
-        http.Response res = await http.post("https://ecothon.space/api/post",
-            body: jsonEncode(data));
+        http.Response res = await http.post("https://ecothon.space/api/posts/create",
+            body: jsonEncode(data), headers: {"Authorization": "Bearer " + token});
         _scaffoldKey.currentState.hideCurrentSnackBar();
         if (res.statusCode == 200) {
           Navigator.of(context).popUntil((route) => route.isFirst);
         } else {
-          String err;
-          try {
-            err = jsonDecode(res.body)["error"];
-          } catch (Exception) {
-            err = jsonDecode(res.reasonPhrase);
-          } finally {
-            _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(err)));
-          }
+					dynamic decoded = jsonDecode(res.body);
+
+					if(decoded is Map && decoded["error"] != null) {
+						_scaffoldKey.currentState
+							.showSnackBar(SnackBar(content: Text(decoded["error"])));
+					} else {
+						_scaffoldKey.currentState
+							.showSnackBar(SnackBar(content: Text(res.reasonPhrase)));
+					}
         }
       } catch (Exception) {
+      	print(Exception);
         _scaffoldKey.currentState.showSnackBar(
             SnackBar(content: Text(Exception)));
       }
@@ -116,7 +123,7 @@ class _PostPageState extends State<PostPage> {
       body: Container(
         padding: EdgeInsets.all(8),
         child: Column(children: [
-          Text(achievement["name"]),
+          Text(achievement["title"]),
           Row(
             children: [
               MaterialButton(
