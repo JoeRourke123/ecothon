@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:ecothon/feed.dart';
 import 'map.dart';
-import 'settings.dart';
+import 'profile.dart';
 
 GlobalKey<ScaffoldState> globalScaffold = GlobalKey<ScaffoldState>();
 
