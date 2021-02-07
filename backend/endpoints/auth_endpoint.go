@@ -142,6 +142,13 @@ func UserProfile(c *fiber.Ctx) error {
 	var posts []models.ReturnPost
 	utils.GetPosts(viewingUsername, &posts, c)
 
+	if user.Followers == nil {
+		user.Followers = make([]string, 0)
+	}
+	if user.Following == nil {
+		user.Following = make([]string, 0)
+	}
+
 	return c.JSON(bson.M{
 		"following": isFollowing,
 		"user":      user,
