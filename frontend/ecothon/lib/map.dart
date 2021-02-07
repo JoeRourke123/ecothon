@@ -32,8 +32,8 @@ class _MapPageState extends State<MapPage> {
     return Container(
         child: FlutterMap(
       options: MapOptions(
-        center: Provider.of<GeneralStore>(context, listen: false).mapPos,
-        zoom: Provider.of<GeneralStore>(context, listen: false).mapZoom,
+        center: Provider.of<GeneralStore>(context, listen: false).mapPos ?? LatLng(51.5, -0.09),
+        zoom: Provider.of<GeneralStore>(context, listen: false).mapZoom ?? 13,
         onPositionChanged: (mapPosition, boolValue) {
           Provider.of<GeneralStore>(context, listen: false).mapPos =
               mapPosition.center;
