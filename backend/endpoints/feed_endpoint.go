@@ -10,7 +10,7 @@ import (
 	options2 "go.mongodb.org/mongo-driver/mongo/options"
 )
 
-const MAX_DISTANCE int = 10000
+const MAX_DISTANCE int = 1000000
 
 func GetFeed(c *fiber.Ctx) error {
 	var user models.User
