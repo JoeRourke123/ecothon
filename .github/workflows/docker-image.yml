@@ -1,7 +1,10 @@
+name: Deploy to kubernetes
+
+    
 on:
   push:
     branches:
-      - master
+      - main
     paths:
       - 'config/**'
       - 'site/**'
@@ -33,7 +36,7 @@ jobs:
       run: doctl registry login --expiry-seconds 600
 
     - name: Push image to DigitalOcean Container Registry
-      run: docker push registry.digitalocean.com/asb/static-example
+      run: docker push registry.digitalocean.com/ecothon/ecothon
 
     - name: Update deployment file
       run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|registry.digitalocean.com/ecothon/ecothon:'${TAG}'|' $GITHUB_WORKSPACE/backend/deployment.yml
