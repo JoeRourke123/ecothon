@@ -31,3 +31,5 @@ Helping communities fight for the environment. Compete with friends and people i
 ## Screenshots
 
 ![Screenshots of the app](https://raw.githubusercontent.com/JoeRourke123/ecothon/main/backend/static/screenshot-combo.png)
+
+You can see [here](https://github.com/JoeRourke123/ecothon/tree/main/backend/static) for some more screenshots.
