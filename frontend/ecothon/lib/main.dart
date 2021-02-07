@@ -69,6 +69,10 @@ class _MyHomePageState extends State<MyHomePage> {
       icon: Icon(Icons.person),
       label: 'Profile',
     ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.map),
+      label: 'Map',
+    ),
   ];
 
   PageController _controller = PageController(
