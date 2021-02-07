@@ -148,3 +148,37 @@ func UserProfile(c *fiber.Ctx) error {
 		"posts":     posts,
 	})
 }
+
+func UserFollow(c *fiber.Ctx) error {
+	var currentUser models.User
+	currentUsername := c.Locals("USER").(string)
+	utils.GetUser(currentUsername, c, &currentUser)
+
+	var user models.User
+	viewingUsername := c.Params("username")
+	utils.GetUser(viewingUsername, c, &user)
+
+	collection, _ := utils.GetMongoDbCollection(c, "users")
+	collection.UpdateOne(c.Context(), bson.M{
+		"username": currentUsername,
+	}, bson.M{
+		"$push": bson.M{
+			"following": bson.M{
+				"$each": bson.A{ viewingUsername },
+				"$sort": 1,
+			},
+		},
+	})
+	collection.UpdateOne(c.Context(), bson.M{
+		"username": viewingUsername,
+	}, bson.M{
+		"$push": bson.M{
+			"followers": bson.M{
+				"$each": bson.A{ currentUsername },
+				"$sort": 1,
+			},
+		},
+	})
+
+	return c.SendStatus(fiber.StatusOK)
+}
