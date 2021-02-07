@@ -1,7 +1,10 @@
+name: Deploy to kubernetes
+
+    
 on:
   push:
     branches:
-      - master
+      - main
     paths:
       - 'config/**'
       - 'site/**'
