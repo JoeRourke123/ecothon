@@ -48,11 +48,12 @@ func CreateUploadURL(c *fiber.Ctx) error {
 
 	content := fmt.Sprintf("image/%s", up.Extension)
 
+	acl := "public-read"
 	req, _ := s3Client.PutObjectRequest(&s3.PutObjectInput{
 		Bucket:      aws.String("ecothon"),
 		Key:         aws.String(filename),
 		ContentType: aws.String(content),
-		//ACL:         aws.String("public-read"),
+		ACL:         &acl,
 		//ContentMD5:  aws.String("false"),
 	})
 
