@@ -12,7 +12,7 @@ import (
 const port string = "0.0.0.0:3000"
 
 func main() {
-	app := fiber.New()
+	app := fiber.New(fiber.Config{ServerHeader: "just-a-hapi-guy/2.0"})
 
 	app.Use(logger.New())
 	app.Use(compress.New())
