@@ -210,7 +210,7 @@ class _FeedCardState extends State<FeedCard> {
               	setState(() {
               	  offset = 2.0;
               	});
-              	showMaterialModalBottomSheet(context: context, builder: (context) => CommentScreen(post: widget.data));
+              	showMaterialModalBottomSheet(context: context, useRootNavigator: true, expand: false, builder: (context) => CommentScreen(post: widget.data));
 							},
               onDoubleTap: () async {
                 String endpoint;

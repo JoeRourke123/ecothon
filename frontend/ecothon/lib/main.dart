@@ -149,13 +149,13 @@ class _MyHomePageState extends State<MyHomePage> {
             child: SafeArea(
                 child: Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 15.0, vertical: 8),
+                        horizontal: 15.0, vertical: 10),
                     child: GNav(
                         gap: 8,
                         activeColor: Colors.black,
                         iconSize: 24,
                         padding:
-                            EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                            EdgeInsets.symmetric(horizontal: 20, vertical: 6),
                         duration: Duration(milliseconds: 400),
                         tabBackgroundColor: Colors.grey[100],
                         tabs: [

@@ -32,7 +32,7 @@ class _SignupPageState extends State<SignupPage> {
             .showSnackBar(SnackBar(content: Text("Processing")));
         try {
           http.Response res =
-              await http.post("http://ecothon.space/api/auth/create-user",
+              await http.post("https://ecothon.space/api/auth/create-user",
                   body: jsonEncode({
                     "firstname": _firstnameController.text,
                     "lastname": _lastnameController.text,
@@ -42,6 +42,7 @@ class _SignupPageState extends State<SignupPage> {
                   }));
           _scaffoldKey.currentState.hideCurrentSnackBar();
           if (res.statusCode == 200) {
+          	print(res.body);
             var data = jsonDecode(res.body);
             String username = data["user"]["username"];
             String token = data["auth"];
