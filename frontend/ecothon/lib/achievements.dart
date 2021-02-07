@@ -38,12 +38,12 @@ class _AchievementsPageState extends State<AchievementsPage> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        margin: EdgeInsets.only(top: 20),
         child: FutureBuilder(
           future: getAchievements(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
               return ListView.builder(
+								padding: EdgeInsets.only(top: 20),
                 shrinkWrap: true,
                 itemCount: snapshot.data.length,
                 itemBuilder: (c, i) => AchievementCard(achievement: snapshot.data[i],),
