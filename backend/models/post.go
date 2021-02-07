@@ -31,16 +31,16 @@ type Post struct {
 }
 
 type ReturnPost struct {
-	_id            primitive.ObjectID `json:"id,omitempty"`
+	_id            primitive.ObjectID `json:"_id"`
 	User           string             `json:"user"`
-	Picture        string             `json:"picture,omitempty"`
-	AchievementObj bson.M        `json:"achievement,omitempty"`
-	Achievement    primitive.ObjectID `json:"achievement_id,omitempty"`
-	Type           string             `json:"type,omitempty"`
-	Comments       []Comment          `json:"comments,omitempty"`
+	Picture        string             `json:"picture"`
+	AchievementObj bson.M        `json:"achievement"`
+	Achievement    primitive.ObjectID `json:"achievement_id"`
+	Type           string             `json:"type"`
+	Comments       []Comment          `json:"comments"`
 	LikedBy        []string           `json:"liked_by"`
 	IsLiked        bool               `json:"is_liked"`
 	Geolocation    Location           `json:"geolocation"`
-	Details        bson.M             `json:"details,omitempty"`
-	CreatedAt      time.Time          `json:"created_at,omitempty"`
+	Details        bson.M             `json:"details"`
+	CreatedAt      time.Time          `json:"created_at"`
 }
