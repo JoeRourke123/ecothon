@@ -29,23 +29,18 @@ class _PostPageState extends State<PostPage> {
   final storage = new FlutterSecureStorage();
   File image;
 
-  Future<List<String>> _getImageUrl() async {
+  Future<String> _getImageUrl() async {
     http.Response res =
-        await http.post("https://ecothon.space/api/upload/generate-url",
+        await http.post("https://ecothon.space/api/upload/image",
             headers: {
               "Authorization": "Bearer " +
                   Provider.of<GeneralStore>(context, listen: false).token,
-              "Content-Type": "application/json"
+              "Content-Type": "image/" + image.path.split('.').last
             },
-            body: jsonEncode({"extension": image.path.split('.').last}));
-
+            body: image.readAsBytesSync());
     if (res.statusCode == 200) {
       var decoded = jsonDecode(res.body);
-      return [
-        decoded["final_url"],
-        decoded["presigned_url"],
-        decoded["filename"]
-      ];
+      return decoded["url"];
     } else {
       try {
         dynamic decoded = jsonDecode(res.body);
@@ -61,37 +56,6 @@ class _PostPageState extends State<PostPage> {
     return null;
   }
 
-  Future<String> _uploadImage() async {
-    List<String> urls = await _getImageUrl();
-
-    image = image.renameSync(path.join(path.dirname(image.path), urls[2]));
-
-    String ext = image.path.split(".").last;
-
-    http.Response res = await http.put(urls[1],
-        body: await image.readAsBytes(),
-        headers: {"x-amz-acl": "public-read", "Content-type": "image/" + ext});
-    if (res.statusCode == 200) {
-      _scaffoldKey.currentState
-          .showSnackBar(SnackBar(content: Text("Image uploaded")));
-      return urls[0];
-    } else {
-      try {
-        print(res.body);
-        print(urls[1]);
-        dynamic decoded = jsonDecode(res.body);
-        if (decoded is Map && decoded["error"] != null) {
-          _scaffoldKey.currentState.showSnackBar(
-              SnackBar(content: Text("S3 Image upload: " + decoded["error"])));
-        }
-      } catch (_) {
-        _scaffoldKey.currentState.showSnackBar(
-            SnackBar(content: Text("S3 Image upload: " + res.reasonPhrase)));
-      }
-      return null;
-    }
-  }
-
   void _post() async {
     String token = Provider.of<GeneralStore>(context, listen: false).token;
     Map<String, dynamic> data = {};
@@ -99,7 +63,7 @@ class _PostPageState extends State<PostPage> {
 
     if (image != null) {
       type += " with a photo";
-      String url = await _uploadImage();
+      String url = await _getImageUrl();
       if (url == null) return; // Failed to upload image so it returns
       data["picture"] = url;
     }
