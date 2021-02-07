@@ -34,7 +34,7 @@ type ReturnPost struct {
 	_id            primitive.ObjectID `json:"id,omitempty"`
 	User           string             `json:"user"`
 	Picture        string             `json:"picture,omitempty"`
-	AchievementObj Achievement        `json:"achievement,omitempty"`
+	AchievementObj bson.M        `json:"achievement,omitempty"`
 	Achievement    primitive.ObjectID `json:"achievement_id,omitempty"`
 	Type           string             `json:"type,omitempty"`
 	Comments       []Comment          `json:"comments,omitempty"`
