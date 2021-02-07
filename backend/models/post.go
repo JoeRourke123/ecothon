@@ -31,7 +31,7 @@ type Post struct {
 }
 
 type ReturnPost struct {
-	_id            primitive.ObjectID `json:"_id"`
+	_id            primitive.ObjectID `json:"id"`
 	User           string             `json:"user"`
 	Picture        string             `json:"picture"`
 	AchievementObj bson.M        `json:"achievement"`
