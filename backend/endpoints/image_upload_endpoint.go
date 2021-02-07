@@ -52,7 +52,7 @@ func CreateUploadURL(c *fiber.Ctx) error {
 		Bucket:      aws.String("ecothon"),
 		Key:         aws.String(filename),
 		ContentType: aws.String(content),
-		//ACL:         aws.String("public-write"),
+		//ACL:         aws.String("public-read"),
 		//ContentMD5:  aws.String("false"),
 	})
 
