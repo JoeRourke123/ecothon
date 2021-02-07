@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:ecothon/main.dart';
+import 'package:ecothon/signup.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ecothon/generalStore.dart';
@@ -51,14 +52,15 @@ class _LoginPageState extends State<LoginPage> {
           String err = json.decode(res.body)["error"];
           _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(err)));
         } else {
-          String err;
           try {
-            err = jsonDecode(res.body)["error"];
-          } catch (Exception) {
-            err = jsonDecode(res.reasonPhrase);
-          } finally {
-            _scaffoldKey.currentState
-                .showSnackBar(SnackBar(content: Text(err)));
+            dynamic decoded = jsonDecode(res.body);
+            if (decoded is Map && decoded["error"] != null) {
+              Scaffold.of(context)
+                  .showSnackBar(SnackBar(content: Text(decoded["error"])));
+            }
+          } catch (_) {
+            Scaffold.of(context)
+                .showSnackBar(SnackBar(content: Text(res.reasonPhrase)));
           }
         }
       } catch (Exception) {
@@ -77,112 +79,116 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       key: _scaffoldKey,
       body: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Colors.green[100], Colors.green[800]],
-            ),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Colors.green[100], Colors.green[800]],
           ),
-          alignment: Alignment.center,
-          padding: EdgeInsets.all(50),
-          child: Form(
+        ),
+        alignment: Alignment.center,
+        padding: EdgeInsets.all(50),
+        child: Form(
             key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Container(
-                  child: Image.asset(
-                    'assets/images/logo.png',
-                    width: 100.0,
-                    height: 100.0,
-                  ),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                TextFormField(
-                  controller: _emailController,
-                  style: TextStyle(color: Colors.grey[700]),
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.all(12),
-                    hintText: "Email",
-                    filled: true,
-                    fillColor: Colors.grey[300],
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15.0),
-                      borderSide: BorderSide(
-                          color: Colors.grey[700],
-                          width: 1.0
-                      ),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15.0),
-                      borderSide: BorderSide(
-                        color: Colors.transparent,
-                      ),
+            child: Center(
+              child: ListView(
+                shrinkWrap: true,
+                children: <Widget>[
+                  Container(
+                    child: Image.asset(
+                      'assets/images/logo.png',
+                      width: 100.0,
+                      height: 100.0,
                     ),
                   ),
-                  validator: (value) {
-                    RegExp regExp = new RegExp(
-                        r"^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$",
-                        caseSensitive: false,
-                        multiLine: false);
-                    if (!regExp.hasMatch(value) || value.isEmpty) {
-                      return "Invalid Email";
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                TextFormField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  style: TextStyle(color: Colors.grey[700]),
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.all(12),
-                    hintText: "Password",
-                    filled: true,
-                    fillColor: Colors.grey[300],
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15.0),
-                      borderSide: BorderSide(
-                          color: Colors.grey[700],
-                          width: 1.0
-                      ),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15.0),
-                      borderSide: BorderSide(
-                        color: Colors.transparent,
-                      ),
-                    ),
+                  SizedBox(
+                    height: 10,
                   ),
-                  validator: (value) {
-                    /*RegExp regExp = new RegExp(
-                      r"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$",
-                      caseSensitive: true,
-                      multiLine: false);
-                  if (!regExp.hasMatch(value) || value.isEmpty) {
-                    return "Password should have\n* Uppercase and Lowercase letters\n* At least 1 number";
-                  }*/
-                    return null;
-                  },
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                MaterialButton(
-                  child: Text("Login"),
-                  onPressed: _login,
-                  textColor: Colors.white,
-                  color: Colors.grey[700],
-                )
-              ],
-            ),
-          )),
+                  TextFormField(
+                    controller: _emailController,
+                    style: TextStyle(color: Colors.grey[700]),
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.all(12),
+                      hintText: "Email",
+                      filled: true,
+                      fillColor: Colors.grey[300],
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                        borderSide:
+                            BorderSide(color: Colors.grey[700], width: 1.0),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                        borderSide: BorderSide(
+                          color: Colors.transparent,
+                        ),
+                      ),
+                    ),
+                    validator: (value) {
+                      RegExp regExp = new RegExp(
+                          r"^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$",
+                          caseSensitive: false,
+                          multiLine: false);
+                      if (!regExp.hasMatch(value) || value.isEmpty) {
+                        return "Invalid Email";
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  TextFormField(
+                    controller: _passwordController,
+                    obscureText: true,
+                    style: TextStyle(color: Colors.grey[700]),
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.all(12),
+                      hintText: "Password",
+                      filled: true,
+                      fillColor: Colors.grey[300],
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                        borderSide:
+                            BorderSide(color: Colors.grey[700], width: 1.0),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                        borderSide: BorderSide(
+                          color: Colors.transparent,
+                        ),
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return "Enter your password";
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  MaterialButton(
+                    child: Text("Login"),
+                    onPressed: _login,
+                    textColor: Colors.white,
+                    color: Colors.grey[700],
+                  ),
+                  MaterialButton(
+                    onPressed: () {
+                      Navigator.of(context)
+                          .push(MaterialPageRoute(builder: (context) {
+                        return SignupPage();
+                      }));
+                    },
+                    child: Text("Don't have an account? Sign up here"),
+                    textColor: Colors.grey[200],
+                  ),
+                ],
+              ),
+            )),
+      ),
     );
   }
 }

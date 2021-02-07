@@ -51,7 +51,7 @@ class _FeedPageState extends State<FeedPage>
       http.Response res = await http.post('https://ecothon.space/api/posts',
           body: jsonEncode({
             "type": "Point",
-            "coordinates": [position.latitude, position.longitude]
+            "coordinates": [position.longitude, position.latitude]
           }),
           headers: {
             "Authorization": "Bearer " +
@@ -60,18 +60,21 @@ class _FeedPageState extends State<FeedPage>
 
       if (res.statusCode == 200) {
         var decoded = jsonDecode(res.body);
+        print(decoded);
         for (var i in decoded) {
           items.add(FeedItemData.fromJson(i));
         }
         Provider.of<GeneralStore>(context, listen: false).setFeedItems(items);
       } else {
-        String err;
         try {
-          err = jsonDecode(res.body)["error"];
-        } catch (Exception) {
-          err = res.reasonPhrase;
-        } finally {
-          Scaffold.of(context).showSnackBar(SnackBar(content: Text(err)));
+          dynamic decoded = jsonDecode(res.body);
+          if (decoded is Map && decoded["error"] != null) {
+            Scaffold.of(context)
+                .showSnackBar(SnackBar(content: Text(decoded["error"])));
+          }
+        } catch (_) {
+          Scaffold.of(context)
+              .showSnackBar(SnackBar(content: Text(res.reasonPhrase)));
         }
       }
     } catch (Exception) {

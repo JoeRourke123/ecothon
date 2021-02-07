@@ -1,8 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:ecothon/generalStore.dart';
+import 'package:ecothon/main.dart';
 import 'package:ecothon/post.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:flutter_overlay_loader/flutter_overlay_loader.dart';
+import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 class AchievementScreen extends StatefulWidget {
   final Map<String, dynamic> achievement;
@@ -105,8 +109,19 @@ class _AchievementScreenState extends State<AchievementScreen> {
 								crossAxisAlignment: CrossAxisAlignment.end,
 								mainAxisAlignment: MainAxisAlignment.spaceAround,
 								children: [
-									MaterialButton(child: Text("Complete"), onPressed: () {
+									MaterialButton(child: Text("Complete"), onPressed: () async {
+										Loader.show(context, progressIndicator: CircularProgressIndicator(backgroundColor: Colors.green,));
+										http.Response resp = await http.post("https://ecothon.space/api/achievements/" + widget.achievement["_id"] + "/done",
+										headers: { "Authorization": "Bearer " + Provider.of<GeneralStore>(context, listen: false).token });
 
+										Navigator.of(context).pop();
+										Loader.hide();
+
+										if(resp.statusCode == 200) {
+											globalScaffold.currentState.showSnackBar(SnackBar(content: Text("Successfully completed!")));
+										} else {
+											globalScaffold.currentState.showSnackBar(SnackBar(content: Text("There was a problem when completing your achievement!")));
+										}
 									}, color: Colors.green.shade600, textColor: Colors.white,),
 									MaterialButton(child: Text("Post"), onPressed: () {
 										Navigator.of(context).push(

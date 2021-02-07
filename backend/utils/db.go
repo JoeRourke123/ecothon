@@ -1,10 +1,12 @@
 package utils
 
 import (
+	"context"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"log"
 	"os"
+	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -14,13 +16,15 @@ import (
 //GetMongoDbConnection get connection of mongodb
 func GetMongoDbConnection(c *fiber.Ctx) (*mongo.Client, error) {
 
-	client, err := mongo.Connect(c.Context(), options.Client().ApplyURI(fmt.Sprintf("mongodb+srv://ecothon:%s@ecothon.xkbqr.mongodb.net/ecothon?retryWrites=true&w=majority", os.Getenv("ECOTHON_DB_PASS"))))
+	ctx, _ := context.WithTimeout(context.Background(), 30 * time.Second)
+
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(fmt.Sprintf("mongodb+srv://ecothon:%s@ecothon.xkbqr.mongodb.net/ecothon?retryWrites=true&w=majority", os.Getenv("ECOTHON_DB_PASS"))))
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = client.Ping(c.Context(), readpref.Primary())
+	err = client.Ping(ctx, readpref.Primary())
 	if err != nil {
 		log.Fatal(err)
 	}

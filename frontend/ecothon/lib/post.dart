@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:ecothon/main.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ecothon/generalStore.dart';
@@ -9,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:path/path.dart' as path;
 
 class PostPage extends StatefulWidget {
   final achievement;
@@ -29,50 +29,81 @@ class _PostPageState extends State<PostPage> {
   final storage = new FlutterSecureStorage();
   File image;
 
-  void _post() async {
-  	String token = Provider.of<GeneralStore>(context, listen: false).token;
-    Map<String, dynamic> data = {};
-    String type = "achievement";
-    if (image != null) {
-      type += " with a photo";
-      http.Response res = await http.post(
-          "https://ecothon.space/api/upload/generate-url",
-          headers: {"Authorization": "Bearer " + token},
-          body: jsonEncode({"extension": image.path.split('.').last}));
-      if (res.statusCode == 200) {
-        var url = jsonDecode(res.body)["presigned_url"];
-        var final_url = jsonDecode(res.body)["final_url"];
-        http.Response res2 =
-            await http.put(url, body: await image.readAsBytes());
-        print(res2.body);
-        if (res2.statusCode == 200) {
-          _scaffoldKey.currentState
-              .showSnackBar(SnackBar(content: Text("Image uploaded")));
-        } else {
-          dynamic decoded = jsonDecode(res.body);
+  Future<List<String>> _getImageUrl() async {
+    http.Response res =
+        await http.post("https://ecothon.space/api/upload/generate-url",
+            headers: {
+              "Authorization": "Bearer " +
+                  Provider.of<GeneralStore>(context, listen: false).token,
+              "Content-Type": "application/json"
+            },
+            body: jsonEncode({"extension": image.path.split('.').last}));
 
-          if(decoded is Map && decoded["error"] != null) {
-						_scaffoldKey.currentState
-							.showSnackBar(SnackBar(content: Text(decoded["error"])));
-					} else {
-						_scaffoldKey.currentState
-							.showSnackBar(SnackBar(content: Text(res.reasonPhrase)));
-					}
+    if (res.statusCode == 200) {
+      var decoded = jsonDecode(res.body);
+      return [
+        decoded["final_url"],
+        decoded["presigned_url"],
+        decoded["filename"]
+      ];
+    } else {
+      try {
+        dynamic decoded = jsonDecode(res.body);
+        if (decoded is Map && decoded["error"] != null) {
+          _scaffoldKey.currentState.showSnackBar(
+              SnackBar(content: Text("Image upload: " + decoded["error"])));
         }
-        data["picture"] = final_url;
-      } else {
-        String err;
-        try {
-          err = jsonDecode(res.body)["error"];
-        } catch (Exception) {
-          err = jsonDecode(res.reasonPhrase);
-        } finally {
-        	print(err);
-          _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(err)));
-        }
-        return;
+      } catch (_) {
+        _scaffoldKey.currentState.showSnackBar(
+            SnackBar(content: Text("Image upload: " + res.reasonPhrase)));
       }
     }
+    return null;
+  }
+
+  Future<String> _uploadImage() async {
+    List<String> urls = await _getImageUrl();
+
+    image = image.renameSync(path.join(path.dirname(image.path), urls[2]));
+
+    String ext = image.path.split(".").last;
+
+    http.Response res = await http.put(urls[1],
+        body: await image.readAsBytes(),
+        headers: {"x-amz-acl": "public-read", "Content-type": "image/" + ext});
+    if (res.statusCode == 200) {
+      _scaffoldKey.currentState
+          .showSnackBar(SnackBar(content: Text("Image uploaded")));
+      return urls[0];
+    } else {
+      try {
+        print(res.body);
+        print(urls[1]);
+        dynamic decoded = jsonDecode(res.body);
+        if (decoded is Map && decoded["error"] != null) {
+          _scaffoldKey.currentState.showSnackBar(
+              SnackBar(content: Text("S3 Image upload: " + decoded["error"])));
+        }
+      } catch (_) {
+        _scaffoldKey.currentState.showSnackBar(
+            SnackBar(content: Text("S3 Image upload: " + res.reasonPhrase)));
+      }
+      return null;
+    }
+  }
+
+  void _post() async {
+    String token = Provider.of<GeneralStore>(context, listen: false).token;
+    Map<String, dynamic> data = {};
+    String type = "achievement";
+
+    if (image != null) {
+      type += " with a photo";
+      String url = await _uploadImage();
+      if (url == null) return; // Failed to upload image so it returns
+      data["picture"] = url;
+    }
+
     data["type"] = type;
     if (_formKey.currentState.validate()) {
       _scaffoldKey.currentState
@@ -82,30 +113,38 @@ class _PostPageState extends State<PostPage> {
         Position position = await geolocator.getCurrentPosition(
             desiredAccuracy: LocationAccuracy.best);
 
-        data["geolocation"] = [position.latitude, position.longitude];
+        data["geolocation"] = [position.longitude, position.latitude];
         data["details"] = _detailsController.text;
         data["achievement"] = achievement["id"];
 
-        http.Response res = await http.post("https://ecothon.space/api/posts/create",
-            body: jsonEncode(data), headers: {"Authorization": "Bearer " + token});
+        http.Response res = await http.post(
+            "https://ecothon.space/api/posts/create",
+            body: jsonEncode(data),
+            headers: {"Authorization": "Bearer " + token});
         _scaffoldKey.currentState.hideCurrentSnackBar();
         if (res.statusCode == 200) {
           Navigator.of(context).popUntil((route) => route.isFirst);
         } else {
-					dynamic decoded = jsonDecode(res.body);
-
-					if(decoded is Map && decoded["error"] != null) {
-						_scaffoldKey.currentState
-							.showSnackBar(SnackBar(content: Text(decoded["error"])));
-					} else {
-						_scaffoldKey.currentState
-							.showSnackBar(SnackBar(content: Text(res.reasonPhrase)));
-					}
+          print("Error: " +
+              res.body +
+              " " +
+              res.reasonPhrase +
+              " " +
+              res.statusCode.toString());
+          try {
+            dynamic decoded = jsonDecode(res.body);
+            if (decoded is Map && decoded["error"] != null) {
+              _scaffoldKey.currentState
+                  .showSnackBar(SnackBar(content: Text(decoded["error"])));
+            }
+          } catch (_) {
+            _scaffoldKey.currentState
+                .showSnackBar(SnackBar(content: Text(res.reasonPhrase)));
+          }
         }
       } catch (Exception) {
-      	print(Exception);
-        _scaffoldKey.currentState.showSnackBar(
-            SnackBar(content: Text(Exception)));
+        _scaffoldKey.currentState
+            .showSnackBar(SnackBar(content: Text(Exception.toString())));
       }
     } else {
       _scaffoldKey.currentState
