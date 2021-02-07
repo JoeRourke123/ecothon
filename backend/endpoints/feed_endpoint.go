@@ -1,6 +1,7 @@
 package endpoints
 
 import (
+	"ecothon/models"
 	"ecothon/utils"
 	"encoding/json"
 	"github.com/gofiber/fiber/v2"
@@ -11,6 +12,10 @@ import (
 const MAX_DISTANCE int = 10000
 
 func GetFeed(c *fiber.Ctx) error {
+	var user models.User
+	var username string = c.Locals("USER").(string)
+	utils.GetUser(username, c, &user)
+
 	collection, err := utils.GetMongoDbCollection(c, "posts")
 	if err != nil {
 		return fiber.ErrInternalServerError
@@ -44,6 +49,10 @@ func GetFeed(c *fiber.Ctx) error {
 	}
 
 	cur.All(c.Context(), &results)
+
+	for _, item := range results {
+		item["is_liked"] = utils.BinarySearch(item["likedby"].([]string), username)
+	}
 
 	if results == nil {
 		return fiber.ErrNotFound
