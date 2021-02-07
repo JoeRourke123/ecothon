@@ -59,6 +59,7 @@ func GetFeed(c *fiber.Ctx) error {
 		var r models.ReturnPost
 		cur.Decode(&r)
 
+		r.ID = cur.Current.Index(0).Value().ObjectID()
 		r.IsLiked = utils.BinarySearch(r.LikedBy, username)
 
 		aCur := achievementsCollection.FindOne(c.Context(), bson.D{
