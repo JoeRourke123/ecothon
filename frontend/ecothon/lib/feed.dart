@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
+import 'package:ecothon/components/feedCard.dart';
 import 'package:flutter/material.dart';
 import 'package:ecothon/generalStore.dart';
 import 'package:provider/provider.dart';
@@ -19,8 +20,13 @@ class _FeedPageState extends State<FeedPage>
   bool err = false;
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
     _pullRefresh();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
         child: RefreshIndicator(
             onRefresh: _pullRefresh,
@@ -30,9 +36,8 @@ class _FeedPageState extends State<FeedPage>
               itemBuilder: (context, index) {
                 return Consumer<GeneralStore>(
                   builder: (context, feed, child) {
-                    return FeedItem(
+                    return FeedCard(
                       data: feed.feedItemData[index],
-                      index: index,
                     );
                   },
                 );
@@ -59,9 +64,9 @@ class _FeedPageState extends State<FeedPage>
           });
 
       if (res.statusCode == 200) {
-        var decoded = jsonDecode(res.body);
+        var decoded = List<Map<String, dynamic>>.from(jsonDecode(res.body));
         print(decoded);
-        for (var i in decoded) {
+        for (Map<String, dynamic> i in decoded) {
           items.add(FeedItemData.fromJson(i));
         }
         Provider.of<GeneralStore>(context, listen: false).setFeedItems(items);
@@ -78,7 +83,7 @@ class _FeedPageState extends State<FeedPage>
         }
       }
     } catch (Exception) {
-      print(Exception);
+      print("Breaking here: " + Exception.toString());
       Scaffold.of(context).showSnackBar(
           SnackBar(content: Text("Failed to fetch feed. Please retry")));
     }
@@ -88,62 +93,44 @@ class _FeedPageState extends State<FeedPage>
   bool get wantKeepAlive => true;
 }
 
-class FeedItem extends StatelessWidget {
-  final int index;
-  final FeedItemData data;
-  final rng = new Random();
-
-  List colors = Colors.primaries;
-
-  FeedItem({Key key, this.data, this.index}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    int rand = rng.nextInt(colors.length);
-    return Container(
-      padding: EdgeInsets.all(8),
-      child: Center(child: Text(this.data.user + "\n" + this.data.achievement)),
-      decoration: BoxDecoration(
-          border: Border.all(color: Colors.transparent),
-          borderRadius: BorderRadius.all(Radius.circular(20)),
-          gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [this.colors[rand][100], this.colors[rand][900]])),
-    );
-  }
-}
-
-@immutable
 class FeedItemData {
+  final String id;
   final String user;
   final String achievement;
   final String type;
-  final String comments;
-  final String likedBy;
-  final String location;
-  final String details;
+  final List<Map<String, dynamic>> comments;
+  final Map<String, dynamic> location;
+  final Map<String, dynamic> details;
   final DateTime createdAt;
+  List<String> likedby;
+  final String picture;
+  bool isLiked;
 
   FeedItemData(
-      {this.user,
+      {this.id,
+      this.user,
       this.achievement,
       this.type,
       this.comments,
-      this.likedBy,
       this.location,
       this.details,
-      this.createdAt});
+      this.createdAt,
+      this.likedby,
+      this.picture,
+      this.isLiked});
 
   factory FeedItemData.fromJson(Map<String, dynamic> json) {
     return FeedItemData(
+        id: json["_id"],
         user: json["user"],
         achievement: json["achievement"],
         type: json["type"],
-        comments: json["comments"],
-        likedBy: json["liked_by"],
+        comments: List<Map<String, dynamic>>.from(json["comments"]),
         location: json["geolocation"],
         details: json["details"],
-        createdAt: json["created_at"]);
+        createdAt: json["created_at"],
+        likedby: List<String>.from(json["likedby"]),
+        picture: json["picture"],
+        isLiked: json["is_liked"]);
   }
 }

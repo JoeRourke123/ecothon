@@ -7,10 +7,16 @@ class GeneralStore extends ChangeNotifier {
   String username;
   String token;
   List<FeedItemData> feedItemData = [];
+  List<Map<String, dynamic>> achievementData = [];
 
   void setLoginData(String username, String token) {
     this.username = username;
     this.token = token;
+  }
+
+  void setAchievementData(List<Map<String, dynamic>> items) {
+    achievementData = items;
+    notifyListeners();
   }
 
   void setFeedItems(List<FeedItemData> items) {
@@ -18,12 +24,7 @@ class GeneralStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  void add(FeedItemData item) {
-    feedItemData.add(item);
-    notifyListeners();
-  }
-
-  void removeAll() {
+  void removeAllFeedData() {
     feedItemData.clear();
     notifyListeners();
   }

@@ -77,10 +77,10 @@ class _PostPageState extends State<PostPage> {
         Position position = await geolocator.getCurrentPosition(
             desiredAccuracy: LocationAccuracy.best);
 
-        data["geolocation"] = [position.longitude, position.latitude];
-        data["details"] = _detailsController.text;
-        data["achievement"] = achievement["id"];
-
+        data["geolocation"] = {"type": "Point", "coordinates": [position.longitude, position.latitude]};
+        data["details"] = {"caption": _detailsController.text};
+        data["achievement"] = achievement["_id"];
+        print(jsonEncode(data));
         http.Response res = await http.post(
             "https://ecothon.space/api/posts/create",
             body: jsonEncode(data),
