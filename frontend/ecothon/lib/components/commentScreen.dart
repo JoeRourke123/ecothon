@@ -161,12 +161,13 @@ class _CommentScreenState extends State<CommentScreen> {
                             Provider.of<GeneralStore>(context, listen: false)
                                 .username
                       };
-                      data["commented_at"] = data["commented_at"].toString();
                       await http.post(
                           "https://ecothon.space/api/posts/" +
                               widget.post.id +
                               "/comment",
-                          body: jsonEncode(data),
+                          body: jsonEncode({
+														"comment": comment,
+													}),
                           headers: {
                             "Authorization": "Bearer " +
                                 Provider.of<GeneralStore>(context,

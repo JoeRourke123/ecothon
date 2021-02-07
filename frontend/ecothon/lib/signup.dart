@@ -34,8 +34,8 @@ class _SignupPageState extends State<SignupPage> {
           http.Response res =
               await http.post("https://ecothon.space/api/auth/create-user",
                   body: jsonEncode({
-                    "firstname": _firstnameController.text,
-                    "lastname": _lastnameController.text,
+                    "first_name": _firstnameController.text,
+                    "last_name": _lastnameController.text,
                     "username": _usernameController.text,
                     "email": _emailController.text,
                     "password": _password1Controller.text
