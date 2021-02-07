@@ -152,6 +152,11 @@ class _MyHomePageState extends State<MyHomePage> {
 								backgroundColor: Colors.green.shade800.withOpacity(0.75),
 								textColor: Colors.white,
 								iconActiveColor: Colors.white,
+								onPressed: () {
+                	setState(() {
+                	  _selectedIndex = 0;
+                	});
+								},
               ),
               GButton(
                 icon: Icons.stars_rounded,
@@ -159,6 +164,11 @@ class _MyHomePageState extends State<MyHomePage> {
 								backgroundColor: Colors.green.shade800.withOpacity(0.75),
 								textColor: Colors.white,
 								iconActiveColor: Colors.white,
+								onPressed: () {
+									setState(() {
+										_selectedIndex = 1;
+									});
+								},
               ),
               GButton(
                 icon: Icons.face_rounded,
@@ -166,6 +176,11 @@ class _MyHomePageState extends State<MyHomePage> {
 								backgroundColor: Colors.green.shade800.withOpacity(0.75),
 								textColor: Colors.white,
 								iconActiveColor: Colors.white,
+								onPressed: () {
+									setState(() {
+										_selectedIndex = 2;
+									});
+								},
               ),
             ],
             selectedIndex: _selectedIndex,

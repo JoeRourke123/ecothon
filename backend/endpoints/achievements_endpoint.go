@@ -14,7 +14,7 @@ func GetCompletedAchievements(c *fiber.Ctx) error {
 	var user_id string = c.Locals("USER").(string)
 	utils.GetUser(user_id, c, &user)
 
-	collection, err := utils.GetMongoDbCollection("achievements")
+	collection, err := utils.GetMongoDbCollection(c, "achievements")
 
 	if err != nil {
 		return fiber.ErrInternalServerError
@@ -49,7 +49,7 @@ func GetIncompletedAchievements(c *fiber.Ctx) error {
 	var user_id string = c.Locals("USER").(string)
 	utils.GetUser(user_id, c, &user)
 
-	collection, err := utils.GetMongoDbCollection("achievements")
+	collection, err := utils.GetMongoDbCollection(c, "achievements")
 
 	if err != nil {
 		return fiber.ErrInternalServerError
@@ -81,7 +81,7 @@ func GetIncompletedAchievements(c *fiber.Ctx) error {
 }
 
 func GetAllAchievements(c *fiber.Ctx) error {
-	collection, err := utils.GetMongoDbCollection("achievements")
+	collection, err := utils.GetMongoDbCollection(c, "achievements")
 
 	if err != nil {
 		return fiber.ErrInternalServerError

@@ -1,7 +1,6 @@
 package endpoints
 
 import (
-	"context"
 	"ecothon/models"
 	"ecothon/utils"
 	"time"
@@ -20,7 +19,7 @@ func CreatePost(c *fiber.Ctx) error {
 
 	now := time.Now()
 
-	collection, err := utils.GetMongoDbCollection("posts")
+	collection, err := utils.GetMongoDbCollection(c, "posts")
 
 	if err != nil {
 		return fiber.ErrInternalServerError
@@ -39,7 +38,7 @@ func CreatePost(c *fiber.Ctx) error {
 		post.LikedBy = []string{}
 	}
 
-	res, err := collection.InsertOne(context.Background(), post)
+	res, err := collection.InsertOne(c.Context(), post)
 	if err != nil {
 		return fiber.ErrInternalServerError
 	}

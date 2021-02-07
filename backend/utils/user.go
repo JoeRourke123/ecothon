@@ -9,7 +9,7 @@ import (
 )
 
 func GetUser(username string, c *fiber.Ctx, user *models.User) {
-	collection, err := GetMongoDbCollection("users")
+	collection, err := GetMongoDbCollection(c,"users")
 
 	if username == "" || err != nil {
 		return
@@ -24,7 +24,7 @@ func GetUser(username string, c *fiber.Ctx, user *models.User) {
 
 func AddUserAchievement(username string, postID primitive.ObjectID,
 	achievementID primitive.ObjectID, c *fiber.Ctx, now time.Time) error {
-	achievementCol, err := GetMongoDbCollection("achievements")
+	achievementCol, err := GetMongoDbCollection(c,"achievements")
 
 	if err != nil {
 		return err
@@ -45,7 +45,7 @@ func AddUserAchievement(username string, postID primitive.ObjectID,
 		}}}})
 
 	if err == nil {
-		userCol, _ := GetMongoDbCollection("users")
+		userCol, _ := GetMongoDbCollection(c,"users")
 
 		_, err = userCol.UpdateOne(c.Context(),
 			bson.D{{"username", username}},
@@ -68,7 +68,7 @@ func AddUserAchievement(username string, postID primitive.ObjectID,
 }
 
 func GetPosts(username string, posts *[]bson.M, c *fiber.Ctx) {
-	postCol, _ := GetMongoDbCollection("posts")
+	postCol, _ := GetMongoDbCollection(c,"posts")
 
 	cur, _ := postCol.Find(c.Context(), bson.D{{
 		"user", username,

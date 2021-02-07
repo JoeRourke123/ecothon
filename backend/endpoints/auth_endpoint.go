@@ -1,7 +1,6 @@
 package endpoints
 
 import (
-	"context"
 	"ecothon/models"
 	"ecothon/responses"
 	"ecothon/utils"
@@ -28,7 +27,7 @@ func generateHash(pass []byte) string {
 }
 
 func CreateUser(c *fiber.Ctx) error {
-	collection, err := utils.GetMongoDbCollection("users")
+	collection, err := utils.GetMongoDbCollection(c,"users")
 	if err != nil {
 		return fiber.ErrInternalServerError
 	}
@@ -57,7 +56,7 @@ func CreateUser(c *fiber.Ctx) error {
 
 	user.Password = generateHash([]byte(user.Password))
 
-	res, err := collection.InsertOne(context.Background(), user)
+	res, err := collection.InsertOne(c.Context(), user)
 	if err != nil {
 		return fiber.ErrInternalServerError
 	}
@@ -79,7 +78,7 @@ func LoginUser(ctx *fiber.Ctx) error {
 	print(loginData.Email)
 	print(loginData.Password)
 
-	collection, err := utils.GetMongoDbCollection("users")
+	collection, err := utils.GetMongoDbCollection(ctx, "users")
 	if err != nil {
 		return fiber.ErrInternalServerError
 	}
