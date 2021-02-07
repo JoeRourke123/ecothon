@@ -128,63 +128,51 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
         bottomNavigationBar: Container(
-		decoration: BoxDecoration(color: Colors.white, boxShadow: [
-		BoxShadow(blurRadius: 20, color: Colors.black.withOpacity(.1))
-		]),
-		child: SafeArea(
-		child: Padding(
-		padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8),
-		child: GNav(
-            gap: 8,
-            activeColor: Colors.black,
-            iconSize: 24,
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-            duration: Duration(milliseconds: 400),
-            tabBackgroundColor: Colors.grey[100],
-            tabs: [
-              GButton(
-                icon: Icons.view_day,
-                text: 'Feed',
-								backgroundColor: Colors.green.shade800.withOpacity(0.75),
-								textColor: Colors.white,
-								iconActiveColor: Colors.white,
-								onPressed: () {
-                	setState(() {
-                	  _selectedIndex = 0;
-                	});
-								},
-              ),
-              GButton(
-                icon: Icons.stars_rounded,
-                text: 'Achievements',
-								backgroundColor: Colors.green.shade800.withOpacity(0.75),
-								textColor: Colors.white,
-								iconActiveColor: Colors.white,
-								onPressed: () {
-									setState(() {
-										_selectedIndex = 1;
-									});
-								},
-              ),
-              GButton(
-                icon: Icons.face_rounded,
-                text: 'Profile',
-								backgroundColor: Colors.green.shade800.withOpacity(0.75),
-								textColor: Colors.white,
-								iconActiveColor: Colors.white,
-								onPressed: () {
-									setState(() {
-										_selectedIndex = 2;
-									});
-								},
-              ),
-            ],
-            selectedIndex: _selectedIndex,
-            onTabChange: (index) {
-              setState(() {
-                _selectedIndex = index;
-              });
-            })))),
+            decoration: BoxDecoration(color: Colors.white, boxShadow: [
+              BoxShadow(blurRadius: 20, color: Colors.black.withOpacity(.1))
+            ]),
+            child: SafeArea(
+                child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 15.0, vertical: 8),
+                    child: GNav(
+                        gap: 8,
+                        activeColor: Colors.black,
+                        iconSize: 24,
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                        duration: Duration(milliseconds: 400),
+                        tabBackgroundColor: Colors.grey[100],
+                        tabs: [
+                          GButton(
+                            icon: Icons.view_day,
+                            text: 'Feed',
+                            backgroundColor:
+                                Colors.green.shade800.withOpacity(0.75),
+                            textColor: Colors.white,
+                            iconActiveColor: Colors.white,
+                          ),
+                          GButton(
+                            icon: Icons.stars_rounded,
+                            text: 'Achievements',
+                            backgroundColor:
+                                Colors.green.shade800.withOpacity(0.75),
+                            textColor: Colors.white,
+                            iconActiveColor: Colors.white,
+                          ),
+                          GButton(
+                            icon: Icons.face_rounded,
+                            text: 'Profile',
+                            backgroundColor:
+                                Colors.green.shade800.withOpacity(0.75),
+                            textColor: Colors.white,
+                            iconActiveColor: Colors.white,
+                          ),
+                        ],
+                        selectedIndex: _selectedIndex,
+                        onTabChange: (index) {
+													_controller.animateToPage(index, duration: Duration(milliseconds: 400), curve: Curves.easeIn);
+												})))),
       ),
     );
   }
