@@ -57,31 +57,36 @@ class _FeedCardState extends State<FeedCard> {
         child: Stack(alignment: Alignment.bottomCenter, children: [
           widget.data.picture != null
               ? GestureDetector(
-						child: Container(
-							child: ClipRRect(
-								borderRadius: BorderRadius.circular(20),
-								child: CachedNetworkImage(
-									imageUrl: widget.data.picture, fit: BoxFit.contain)),
-							width: MediaQuery.of(context).size.width * 0.8,
-							margin: EdgeInsets.only(bottom: 100),
-							decoration: BoxDecoration(boxShadow: [
-								BoxShadow(
-									color: Colors.black26,
-									offset: Offset(offset, offset),
-									blurRadius: 4,
-									spreadRadius: 4)
-							], borderRadius: BorderRadius.circular(20))),
-						onTap: () {
-							showMaterialModalBottomSheet(context: context, builder: (context) => Container(
-								color: Colors.black,
-								alignment: Alignment.center,
-								child: CachedNetworkImage(
-									imageUrl: widget.data.picture,
-									width: MediaQuery.of(context).size.width * 0.9,
-								)
-							));
-						}
-					)
+                  child: Container(
+                      child: ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: CachedNetworkImage(
+                              imageUrl: widget.data.picture,
+                              fit: BoxFit.contain)),
+                      width: MediaQuery.of(context).size.width * 0.8,
+                      margin: EdgeInsets.only(bottom: 100),
+                      decoration: BoxDecoration(boxShadow: [
+                        BoxShadow(
+                            color: Colors.black26,
+                            offset: Offset(offset, offset),
+                            blurRadius: 4,
+                            spreadRadius: 4)
+                      ], borderRadius: BorderRadius.circular(20))),
+                  onTap: () {
+                    showMaterialModalBottomSheet(
+                        context: context,
+                        expand: false,
+                        builder: (context) => Container(
+                            color: Colors.white.withOpacity(0),
+                            alignment: Alignment.center,
+                            child: ClipRRect(
+                                borderRadius: BorderRadius.circular(20),
+                                child: CachedNetworkImage(
+                                  imageUrl: widget.data.picture,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.9,
+                                ))));
+                  })
               : null,
           // TODO: This will probs cause errors lmao
           GestureDetector(
@@ -128,12 +133,12 @@ class _FeedCardState extends State<FeedCard> {
                                 ]),
                                 decoration: BoxDecoration(
                                     color: widget.data.isLiked
-                                        ? Colors.green.shade400
+                                        ? Colors.green.shade800.withOpacity(0.75)
                                         : Colors.white,
                                     border: widget.data.isLiked
                                         ? Border.all(
-                                            width: 2.0,
-                                            color: Colors.green.shade400)
+                                            width: 0.0,
+                                            color: Colors.green.shade800.withOpacity(0.75))
                                         : Border.all(
                                             width: 2.0, color: Colors.blueGrey),
                                     borderRadius: BorderRadius.circular(360)),
@@ -146,10 +151,13 @@ class _FeedCardState extends State<FeedCard> {
                           )
                         ]),
                     SizedBox(height: 20),
-                   	Container(
-											alignment: Alignment.centerLeft,
-											child: Text(widget.data.details["caption"], softWrap: true,),
-										),
+                    Container(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        widget.data.details["caption"],
+                        softWrap: true,
+                      ),
+                    ),
                     if (widget.data.achievement != null)
                       InkWell(
                         child: Container(
@@ -163,7 +171,7 @@ class _FeedCardState extends State<FeedCard> {
                                           fontWeight: FontWeight.w500,
                                           fontStyle: FontStyle.italic))),
                               Container(
-																margin: EdgeInsets.only(left: 5),
+                                margin: EdgeInsets.only(left: 5),
                                 alignment: Alignment.center,
                                 child: Row(children: [
                                   Icon(Icons.park,
@@ -178,7 +186,7 @@ class _FeedCardState extends State<FeedCard> {
                                               fontWeight: FontWeight.bold)))
                                 ]),
                                 decoration: BoxDecoration(
-                                    color: Colors.green.shade400,
+                                    color: Colors.green.shade800.withOpacity(0.75),
                                     borderRadius: BorderRadius.circular(360)),
                                 padding: EdgeInsets.symmetric(
                                     vertical: 4, horizontal: 10),
@@ -223,11 +231,15 @@ class _FeedCardState extends State<FeedCard> {
                 });
               },
               onTapUp: (t) {
-              	setState(() {
-              	  offset = 2.0;
-              	});
-              	showMaterialModalBottomSheet(context: context, useRootNavigator: true, expand: false, builder: (context) => CommentScreen(post: widget.data));
-							},
+                setState(() {
+                  offset = 2.0;
+                });
+                showMaterialModalBottomSheet(
+                    context: context,
+                    useRootNavigator: true,
+                    expand: false,
+                    builder: (context) => CommentScreen(post: widget.data));
+              },
               onDoubleTap: () async {
                 String endpoint;
                 setState(() {
@@ -257,8 +269,10 @@ class _FeedCardState extends State<FeedCard> {
                                 .token
                       });
                   if (res.statusCode == 200) {
-                    Scaffold.of(context).showSnackBar(
-                        SnackBar(content: Text((widget.data.isLiked ? "Post has been liked!" : "You've unliked this post :("))));
+                    Scaffold.of(context).showSnackBar(SnackBar(
+                        content: Text((widget.data.isLiked
+                            ? "Post has been liked!"
+                            : "You've unliked this post :("))));
                   } else {
                     try {
                       dynamic decoded = jsonDecode(res.body);
