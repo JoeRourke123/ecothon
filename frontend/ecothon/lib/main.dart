@@ -10,6 +10,8 @@ import 'package:ecothon/feed.dart';
 import 'profile.dart';
 import 'map.dart';
 
+GlobalKey<ScaffoldState> globalScaffold = GlobalKey<ScaffoldState>();
+
 main() async {
   WidgetsFlutterBinding.ensureInitialized();
   GeneralStore store = GeneralStore();

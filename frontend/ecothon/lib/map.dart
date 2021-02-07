@@ -17,16 +17,31 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
-  bool err = false;
+  MapController mapController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    mapController = MapController();
+
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
         child: FlutterMap(
       options: MapOptions(
-        center: LatLng(51.5, -0.09),
-        zoom: 13.0,
+        center: Provider.of<GeneralStore>(context, listen: false).mapPos,
+        zoom: Provider.of<GeneralStore>(context, listen: false).mapZoom,
+        onPositionChanged: (mapPosition, boolValue) {
+          Provider.of<GeneralStore>(context, listen: false).mapPos =
+              mapPosition.center;
+          Provider.of<GeneralStore>(context, listen: false).mapZoom =
+              mapPosition.zoom;
+        },
       ),
+      mapController: mapController,
       layers: [
         TileLayerOptions(
             urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
