@@ -26,11 +26,12 @@ class _LoginPageState extends State<LoginPage> {
       _scaffoldKey.currentState
           .showSnackBar(SnackBar(content: Text("Processing")));
       try {
-        http.Response res = await http
-            .post("http://ecothon.space/api/auth/login", body: jsonEncode({
-          "email": _emailController.text,
-          "password": _passwordController.text
-        }));
+        http.Response res = await http.post(
+            "http://ecothon.space/api/auth/login",
+            body: jsonEncode({
+              "email": _emailController.text,
+              "password": _passwordController.text
+            }));
         _scaffoldKey.currentState.hideCurrentSnackBar();
         if (res.statusCode == 200) {
           var data = jsonDecode(res.body);
@@ -56,7 +57,8 @@ class _LoginPageState extends State<LoginPage> {
           } catch (Exception) {
             err = jsonDecode(res.reasonPhrase);
           } finally {
-            _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(err)));
+            _scaffoldKey.currentState
+                .showSnackBar(SnackBar(content: Text(err)));
           }
         }
       } catch (Exception) {
@@ -74,20 +76,52 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      appBar: AppBar(
-        title: Text("Login"),
-      ),
       body: Container(
-          padding: EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Colors.green[100], Colors.green[800]],
+            ),
+          ),
+          alignment: Alignment.center,
+          padding: EdgeInsets.all(50),
           child: Form(
             key: _formKey,
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
+                Container(
+                  child: Image.asset(
+                    'assets/images/logo.png',
+                    width: 100.0,
+                    height: 100.0,
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
                 TextFormField(
                   controller: _emailController,
+                  style: TextStyle(color: Colors.grey[700]),
                   decoration: InputDecoration(
-                    contentPadding: EdgeInsets.all(2),
+                    contentPadding: EdgeInsets.all(12),
                     hintText: "Email",
+                    filled: true,
+                    fillColor: Colors.grey[300],
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15.0),
+                      borderSide: BorderSide(
+                          color: Colors.grey[700],
+                          width: 1.0
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15.0),
+                      borderSide: BorderSide(
+                        color: Colors.transparent,
+                      ),
+                    ),
                   ),
                   validator: (value) {
                     RegExp regExp = new RegExp(
@@ -100,11 +134,32 @@ class _LoginPageState extends State<LoginPage> {
                     return null;
                   },
                 ),
+                SizedBox(
+                  height: 10,
+                ),
                 TextFormField(
                   controller: _passwordController,
                   obscureText: true,
+                  style: TextStyle(color: Colors.grey[700]),
                   decoration: InputDecoration(
-                      contentPadding: EdgeInsets.all(2), hintText: "Password"),
+                    contentPadding: EdgeInsets.all(12),
+                    hintText: "Password",
+                    filled: true,
+                    fillColor: Colors.grey[300],
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15.0),
+                      borderSide: BorderSide(
+                          color: Colors.grey[700],
+                          width: 1.0
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15.0),
+                      borderSide: BorderSide(
+                        color: Colors.transparent,
+                      ),
+                    ),
+                  ),
                   validator: (value) {
                     /*RegExp regExp = new RegExp(
                       r"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$",
@@ -116,9 +171,14 @@ class _LoginPageState extends State<LoginPage> {
                     return null;
                   },
                 ),
+                SizedBox(
+                  height: 10,
+                ),
                 MaterialButton(
                   child: Text("Login"),
                   onPressed: _login,
+                  textColor: Colors.white,
+                  color: Colors.grey[700],
                 )
               ],
             ),

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:ecothon/generalStore.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 
 class FeedPage extends StatefulWidget {
@@ -52,7 +51,7 @@ class _FeedPageState extends State<FeedPage>
       http.Response res = await http.post('https://ecothon.space/api/posts',
           body: jsonEncode({
             "type": "Point",
-            "location": [position.latitude, position.longitude]
+            "coordinates": [position.latitude, position.longitude]
           }),
           headers: {
             "Authorization": "Bearer " +
