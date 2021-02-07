@@ -129,82 +129,81 @@ class _PostPageState extends State<PostPage> {
 		}
 	}
 
-	@override
-	Widget build(BuildContext context) {
-		return Scaffold(
-			key: _scaffoldKey,
-			appBar: AppBar(
-				leading: IconButton(
-					icon: Icon(Icons.chevron_left),
-					color: Colors.black,
-					onPressed: () {
-						Navigator.of(context).pop();
-					},
-				),
-				backgroundColor: Colors.white,
-				foregroundColor: Colors.blueGrey,
-				title: Row(
-					crossAxisAlignment: CrossAxisAlignment.center,
-					mainAxisAlignment: MainAxisAlignment.start,
-					children: [
-						Image.asset(
-							'assets/images/logo.png',
-							fit: BoxFit.fitHeight,
-							width: 32,
-						),
-						Padding(
-							padding: EdgeInsets.only(left: 10, top: 2),
-							child: Text("New Post",
-								style: TextStyle(color: Colors.blueGrey)))
-					]),
-				centerTitle: true,
-				shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-				toolbarHeight: 64,
-				elevation: 6.0,
-			),
-			body: Container(
-				padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-				child: ListView(children: [
-					if(achievement != null) Container(
-						alignment: Alignment.centerLeft,
-						padding: EdgeInsets.all(20),
-						margin: EdgeInsets.only(top: 25),
-						child: Row(children: [
-							Expanded(
-								child: Text(achievement["title"],
-									style: TextStyle(
-										fontWeight: FontWeight.w500,
-										fontStyle: FontStyle.italic))),
-							Container(
-								margin: EdgeInsets.only(left: 5),
-								alignment: Alignment.center,
-								child: Row(children: [
-									Icon(Icons.park, size: 16, color: Colors.white),
-									Padding(
-										padding: EdgeInsets.only(left: 5),
-										child: Text(
-											achievement["points"].toString(),
-											style: TextStyle(
-												color: Colors.white,
-												fontWeight: FontWeight.bold)))
-								]),
-								decoration: BoxDecoration(
-									color: Colors.green.shade800.withOpacity(0.75),
-									borderRadius: BorderRadius.circular(360)),
-								padding: EdgeInsets.symmetric(vertical: 4, horizontal: 10),
-							),
-						]),
-						decoration: BoxDecoration(
-							color: Colors.white,
-							borderRadius: BorderRadius.circular(10),
-							boxShadow: [
-								BoxShadow(
-									color: Colors.black.withOpacity(0.2),
-									offset: Offset(1, 1),
-									blurRadius: 4,
-									spreadRadius: 1)
-							])),
-					SizedBox(height: 25),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      key: _scaffoldKey,
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.chevron_left),
+          color: Colors.black,
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        backgroundColor: Colors.white,
+        title: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Image.asset(
+                'assets/images/logo.png',
+                fit: BoxFit.fitHeight,
+                width: 32,
+              ),
+              Padding(
+                  padding: EdgeInsets.only(left: 10, top: 2),
+                  child: Text("New Post",
+                      style: TextStyle(color: Colors.blueGrey)))
+            ]),
+        centerTitle: true,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        toolbarHeight: 64,
+        elevation: 6.0,
+      ),
+      body: Container(
+        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        child: ListView(children: [
+          if(achievement != null) Container(
+              alignment: Alignment.centerLeft,
+              padding: EdgeInsets.all(20),
+              margin: EdgeInsets.only(top: 25),
+              child: Row(children: [
+                Expanded(
+                    child: Text(achievement["title"],
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontStyle: FontStyle.italic))),
+                Container(
+                  margin: EdgeInsets.only(left: 5),
+                  alignment: Alignment.center,
+                  child: Row(children: [
+                    Icon(Icons.park, size: 16, color: Colors.white),
+                    Padding(
+                        padding: EdgeInsets.only(left: 5),
+                        child: Text(
+                            achievement["points"].toString(),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold)))
+                  ]),
+                  decoration: BoxDecoration(
+                      color: Colors.green.shade400,
+                      borderRadius: BorderRadius.circular(360)),
+                  padding: EdgeInsets.symmetric(vertical: 4, horizontal: 10),
+                ),
+              ]),
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        offset: Offset(1, 1),
+                        blurRadius: 4,
+                        spreadRadius: 1)
+                  ])),
+          SizedBox(height: 25),
 					if(image != null) Container(
 						margin: EdgeInsets.only(bottom: 20),
 						height: 200.0,

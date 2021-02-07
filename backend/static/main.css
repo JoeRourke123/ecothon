@@ -1,0 +1,23 @@
+html, body {
+    background: #1f4037;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #99f2c8, #1f4037);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, #99f2c8, #1f4037); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    
+}
+
+.heading {
+    color:#30705f;
+}
+
+/* .subtext {
+    color: floralwhite;
+    position: absolute;
+    top: 50%;
+    left: 60%;
+}
+.subtext-1 {
+    color: floralwhite;
+    position: absolute;
+    top: 55%;
+    left: 60%;
+} */
