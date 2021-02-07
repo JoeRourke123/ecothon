@@ -36,6 +36,10 @@ func SetupRoutes(app *fiber.App) {
 	achievements.Get("/all", middleware.Auth, endpoints.GetAllAchievements)
 	achievements.Post("/:id/done", middleware.Auth, endpoints.DoAchievement)
 
+	leaderboard := api.Group("/leaderboard")
+	leaderboard.Get("", middleware.Auth, endpoints.AllLeaderboard)
+	leaderboard.Get("/following", middleware.Auth, endpoints.FollowingLeaderboard)
+
 	//// Upload image
 	upload := api.Group("/upload")
 	upload.Post("/generate-url", middleware.Auth, endpoints.CreateUploadURL)

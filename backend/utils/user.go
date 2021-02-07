@@ -5,6 +5,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	options2 "go.mongodb.org/mongo-driver/mongo/options"
 	"time"
 )
 
@@ -71,9 +72,14 @@ func AddUserAchievement(username string, postID primitive.ObjectID,
 func GetPosts(username string, posts *[]models.ReturnPost, c *fiber.Ctx) {
 	postCol, _ := GetMongoDbCollection(c,"posts")
 
+	options := options2.Find()
+	options.SetSort(bson.M{
+		"createdat": -1,
+	})
+
 	cur, _ := postCol.Find(c.Context(), bson.D{{
 		"user", username,
-	}})
+	}}, options)
 
 
 	achievementsCollection, _ := GetMongoDbCollection(c, "achievements")
