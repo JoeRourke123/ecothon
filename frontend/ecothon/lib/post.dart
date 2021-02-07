@@ -154,127 +154,128 @@ class _PostPageState extends State<PostPage> {
       body: Container(
         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: ListView(children: [
-          if(achievement != null) Container(
-              alignment: Alignment.centerLeft,
-              padding: EdgeInsets.all(20),
-              margin: EdgeInsets.only(top: 25),
-              child: Row(children: [
-                Expanded(
-                    child: Text(achievement["title"],
-                        style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontStyle: FontStyle.italic))),
-                Container(
-                  margin: EdgeInsets.only(left: 5),
-                  alignment: Alignment.center,
-                  child: Row(children: [
-                    Icon(Icons.park, size: 16, color: Colors.white),
-                    Padding(
-                        padding: EdgeInsets.only(left: 5),
-                        child: Text(
-                            achievement["points"].toString(),
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold)))
-                  ]),
-                  decoration: BoxDecoration(
-                      color: Colors.green.shade400,
-                      borderRadius: BorderRadius.circular(360)),
-                  padding: EdgeInsets.symmetric(vertical: 4, horizontal: 10),
-                ),
-              ]),
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        offset: Offset(1, 1),
-                        blurRadius: 4,
-                        spreadRadius: 1)
-                  ])),
+          if (achievement != null)
+            Container(
+                alignment: Alignment.centerLeft,
+                padding: EdgeInsets.all(20),
+                margin: EdgeInsets.only(top: 25),
+                child: Row(children: [
+                  Expanded(
+                      child: Text(achievement["title"],
+                          style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontStyle: FontStyle.italic))),
+                  Container(
+                    margin: EdgeInsets.only(left: 5),
+                    alignment: Alignment.center,
+                    child: Row(children: [
+                      Icon(Icons.park, size: 16, color: Colors.white),
+                      Padding(
+                          padding: EdgeInsets.only(left: 5),
+                          child: Text(achievement["points"].toString(),
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold)))
+                    ]),
+                    decoration: BoxDecoration(
+                        color: Colors.green.shade400,
+                        borderRadius: BorderRadius.circular(360)),
+                    padding: EdgeInsets.symmetric(vertical: 4, horizontal: 10),
+                  ),
+                ]),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          offset: Offset(1, 1),
+                          blurRadius: 4,
+                          spreadRadius: 1)
+                    ])),
           SizedBox(height: 25),
-					if(image != null) Container(
-						margin: EdgeInsets.only(bottom: 20),
-						height: 200.0,
-						width: 200.0,
-						alignment: Alignment.topCenter,
-						decoration: BoxDecoration(
-							image: DecorationImage(
-								image: image != null
-									? Image.file(image).image
-									: AssetImage('assets/images/shrek.jpg'),
-								fit: BoxFit.contain,
-							),
-							shape: BoxShape.rectangle,
-						),
-					),
           Row(
-						mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-							FlatButton(
-								padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-								onPressed: () async {
-									PickedFile file =
-									await ImagePicker().getImage(source: ImageSource.camera);
-									setState(() {
-										image = File(file.path);
-									});
-								},
-								child: Column(
-									children: [Icon(Icons.camera_alt), Text("From Camera")])),
-							FlatButton(
-								padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-								onPressed: () async {
-									PickedFile file =
-									await ImagePicker().getImage(source: ImageSource.gallery);
-									setState(() {
-										image = File(file.path);
-									});
-								},
-								child: Column(children: [Icon(Icons.photo), Text("From Gallery")]))
+              FlatButton(
+                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  onPressed: () async {
+                    PickedFile file = await ImagePicker()
+                        .getImage(source: ImageSource.camera);
+                    setState(() {
+                      image = File(file.path);
+                    });
+                  },
+                  child: Column(
+                      children: [Icon(Icons.camera_alt), Text("From Camera")])),
+              FlatButton(
+                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  onPressed: () async {
+                    PickedFile file = await ImagePicker()
+                        .getImage(source: ImageSource.gallery);
+                    setState(() {
+                      image = File(file.path);
+                    });
+                  },
+                  child: Column(
+                      children: [Icon(Icons.photo), Text("From Gallery")]))
             ],
           ),
-					SizedBox(height: 25),
+          SizedBox(height: 15),
+          if (image != null)
+            Container(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Image(
+                  image: Image.file(image).image,
+                  fit: BoxFit.contain,
+                ),
+              ),
+              margin: EdgeInsets.only(bottom: 20),
+              height: 225.0,
+              width: 225.0,
+              alignment: Alignment.topCenter,
+            ),
           Form(
             key: _formKey,
             child: Column(
               children: <Widget>[
                 Material(
-									child: TextFormField(
-										controller: _detailsController,
-										decoration: InputDecoration(
-											contentPadding: EdgeInsets.all(12),
-											hintText: "Caption",
-											filled: true,
-											fillColor: Colors.white,
-											focusedBorder: OutlineInputBorder(
-												borderRadius: BorderRadius.circular(15.0),
-												borderSide:
-												BorderSide(color: Colors.grey[700], width: 1.0),
-											),
-											enabledBorder: OutlineInputBorder(
-												borderRadius: BorderRadius.circular(15.0),
-												borderSide: BorderSide(
-													color: Colors.transparent,
-												),
-											),
-										),
-										maxLines: 4,
-										keyboardType: TextInputType.text,
-										textCapitalization: TextCapitalization.sentences,
-									),
-									elevation: 4.0,
-									shadowColor: Colors.black.withOpacity(0.5),
-									borderRadius: BorderRadius.circular(20),
-								),
-								SizedBox(height: 25),
-								FlatButton(
+                  child: TextFormField(
+                    controller: _detailsController,
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.all(12),
+                      hintText: "Caption",
+                      filled: true,
+                      fillColor: Colors.white,
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                        borderSide:
+                            BorderSide(color: Colors.grey[700], width: 1.0),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                        borderSide: BorderSide(
+                          color: Colors.transparent,
+                        ),
+                      ),
+                    ),
+                    maxLines: 4,
+                    keyboardType: TextInputType.text,
+                    textCapitalization: TextCapitalization.sentences,
+                  ),
+                  elevation: 4.0,
+                  shadowColor: Colors.black.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                SizedBox(height: 25),
+                FlatButton(
                   child: Text("Create", style: TextStyle(fontSize: 16)),
                   color: Colors.green.shade400,
                   textColor: Colors.white,
                   padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30)),
                   onPressed: _post,
                 )
               ],
