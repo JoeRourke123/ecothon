@@ -11,7 +11,7 @@ import (
 const MAX_DISTANCE int = 10000
 
 func GetFeed(c *fiber.Ctx) error {
-	collection, err := utils.GetMongoDbCollection("posts")
+	collection, err := utils.GetMongoDbCollection(c, "posts")
 	if err != nil {
 		return fiber.ErrInternalServerError
 	}

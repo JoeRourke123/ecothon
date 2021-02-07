@@ -1,8 +1,8 @@
 package utils
 
 import (
-	"context"
 	"fmt"
+	"github.com/gofiber/fiber/v2"
 	"log"
 	"os"
 
@@ -12,15 +12,15 @@ import (
 )
 
 //GetMongoDbConnection get connection of mongodb
-func GetMongoDbConnection() (*mongo.Client, error) {
+func GetMongoDbConnection(c *fiber.Ctx) (*mongo.Client, error) {
 
-	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(fmt.Sprintf("mongodb+srv://ecothon:%s@ecothon.xkbqr.mongodb.net/ecothon?retryWrites=true&w=majority", os.Getenv("ECOTHON_DB_PASS"))))
+	client, err := mongo.Connect(c.Context(), options.Client().ApplyURI(fmt.Sprintf("mongodb+srv://ecothon:%s@ecothon.xkbqr.mongodb.net/ecothon?retryWrites=true&w=majority", os.Getenv("ECOTHON_DB_PASS"))))
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = client.Ping(context.Background(), readpref.Primary())
+	err = client.Ping(c.Context(), readpref.Primary())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -28,8 +28,8 @@ func GetMongoDbConnection() (*mongo.Client, error) {
 	return client, nil
 }
 
-func GetMongoDbCollection(CollectionName string) (*mongo.Collection, error) {
-	client, err := GetMongoDbConnection()
+func GetMongoDbCollection(c *fiber.Ctx, CollectionName string) (*mongo.Collection, error) {
+	client, err := GetMongoDbConnection(c)
 
 	if err != nil {
 		return nil, err
