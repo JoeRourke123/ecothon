@@ -76,6 +76,7 @@ class _MapPageState extends State<MapPage> {
         zoom: Provider.of<GeneralStore>(context, listen: false).mapZoom ?? 15,
         minZoom: 0,
         maxZoom: 18,
+        interactiveFlags: InteractiveFlag.all & ~InteractiveFlag.rotate,
         onPositionChanged: (mapPosition, boolValue) {
           Provider.of<GeneralStore>(context, listen: false).mapPos =
               mapPosition.center;
