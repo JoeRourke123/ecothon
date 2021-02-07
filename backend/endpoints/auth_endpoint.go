@@ -209,3 +209,28 @@ func UserFollow(c *fiber.Ctx) error {
 
 	return c.SendStatus(fiber.StatusOK)
 }
+
+func SetProfilePicture(c *fiber.Ctx) error {
+	var user models.User
+	username := c.Locals("USER").(string)
+	utils.GetUser(username, c, &user)
+
+	collection, err := utils.GetMongoDbCollection(c, "users")
+
+	var parsed models.User
+	json.Unmarshal(c.Body(), &parsed)
+
+	if err != nil {
+		return fiber.ErrInternalServerError
+	}
+
+	_, err = collection.UpdateOne(c.Context(), bson.M{
+		"username": username,
+	}, bson.M{
+		"$set": bson.M{
+			"profilepicture": parsed.ProfilePicture,
+		},
+	})
+
+	return c.SendStatus(fiber.StatusOK)
+}

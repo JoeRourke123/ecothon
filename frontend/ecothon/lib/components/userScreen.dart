@@ -1,7 +1,12 @@
+import 'dart:io';
+
+import 'package:ecothon/components/editProfile.dart';
 import 'package:ecothon/components/feedCard.dart';
 import 'package:ecothon/generalStore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 
@@ -22,6 +27,7 @@ class _UserScreenState extends State<UserScreen> {
 	String username;
 	bool isMine;
 	bool isFollowing;
+	File image;
 
 	@override
   void initState() {
@@ -92,6 +98,7 @@ class _UserScreenState extends State<UserScreen> {
         Expanded(
             child: isMine ? FlatButton(
 							onPressed: () {
+								showMaterialModalBottomSheet(context: context, expand: false, builder: (context) => EditProfileMenu());
 							},
 							color: Colors.green.shade800,
 							height: 58,
