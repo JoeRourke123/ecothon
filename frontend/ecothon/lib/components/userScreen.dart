@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -6,6 +7,8 @@ import 'package:ecothon/components/feedCard.dart';
 import 'package:ecothon/generalStore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_overlay_loader/flutter_overlay_loader.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:provider/provider.dart';
@@ -29,19 +32,38 @@ class _UserScreenState extends State<UserScreen> {
   bool isMine;
   bool isFollowing;
   File image;
+  Map<String, dynamic> _profile;
 
   @override
   void initState() {
     super.initState();
-
+    _profile = widget.user;
     username = Provider.of<GeneralStore>(context, listen: false).username;
-    isMine = username == widget.user["user"]["username"];
-    isFollowing = widget.user["following"];
+    isMine = username == _profile["user"]["username"];
+    isFollowing = _profile["following"];
+  }
+
+  Future<Map<String, dynamic>> refreshProfile() async {
+    try {
+      String token = Provider.of<GeneralStore>(context, listen: false).token;
+      http.Response resp = await http.get(
+          "https://ecothon.space/api/user/" +
+              _profile["user"]["username"] +
+              "/profile",
+          headers: {"Authorization": "Bearer " + token});
+
+      Map<String, dynamic> user =
+          Map<String, dynamic>.from(jsonDecode(resp.body));
+      return user;
+    } catch (e) {
+      print(e);
+      return {};
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    print(widget.user["user"]);
+    print(_profile["user"]);
     return Container(
         child: ListView(children: <Widget>[
       SizedBox(height: 30),
@@ -58,10 +80,11 @@ class _UserScreenState extends State<UserScreen> {
                 blurRadius: 4)
           ],
           image: DecorationImage(
-            image: (widget.user["user"]["profile_picture"] == "" ||
-                    widget.user["user"]["profile_picture"] == null
+            image: (_profile["user"]["profile_picture"] == "" ||
+                    _profile["user"]["profile_picture"] == null
                 ? AssetImage("assets/images/shrek.png")
-                : CachedNetworkImageProvider(widget.user["user"]["profile_picture"])),
+                : CachedNetworkImageProvider(
+                    _profile["user"]["profile_picture"])),
             fit: BoxFit.cover,
           ),
           shape: BoxShape.circle,
@@ -73,13 +96,13 @@ class _UserScreenState extends State<UserScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-                widget.user["user"]["first_name"] +
+                _profile["user"]["first_name"] +
                     " " +
-                    widget.user["user"]["last_name"],
+                    _profile["user"]["last_name"],
                 style: TextStyle(fontSize: 32)),
             Padding(
                 padding: EdgeInsets.only(top: 5),
-                child: Text("@" + widget.user["user"]["username"],
+                child: Text("@" + _profile["user"]["username"],
                     style: TextStyle(fontWeight: FontWeight.bold)))
           ]),
       SizedBox(height: 20),
@@ -90,11 +113,11 @@ class _UserScreenState extends State<UserScreen> {
             child: Column(children: [
               Icon(
                 Icons.park,
-                color: Colors.green.shade600,
+                color: Colors.green.shade800.withOpacity(0.75),
                 size: 32,
               ),
-              Text(widget.user["user"]["points"].toString(),
-                  style: TextStyle(fontSize: 24, color: Colors.green.shade600))
+              Text(_profile["user"]["points"].toString(),
+                  style: TextStyle(fontSize: 24, color: Colors.green.shade800.withOpacity(0.75)))
             ]),
             padding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
           ),
@@ -104,13 +127,25 @@ class _UserScreenState extends State<UserScreen> {
                 ? FlatButton(
                     onPressed: () {
                       showMaterialModalBottomSheet(
-                          context: context,
-                          expand: false,
-                          builder: (context) => EditProfileMenu());
+                              context: context,
+                              expand: false,
+                              builder: (context) => EditProfileMenu())
+                          .then((value) async {
+                        Loader.show(context,
+                            progressIndicator: SpinKitFoldingCube(
+                                color: Colors.green.shade800.withOpacity(0.75)));
+                        Map<String, dynamic> profile = await refreshProfile();
+                        Loader.hide();
+                        setState(() {
+                          _profile = profile;
+                        });
+                      });
                     },
-                    color: Colors.green.shade800,
+                    color: Colors.green.shade800.withOpacity(0.75),
                     height: 58,
                     textColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(40)),
                     child: Column(
                         children: [Icon(Icons.edit), Text("Edit Profile")]))
                 : (isFollowing
@@ -118,10 +153,10 @@ class _UserScreenState extends State<UserScreen> {
                         onPressed: () async {
                           Scaffold.of(context).showSnackBar(SnackBar(
                               content: Text("You've unfollowed " +
-                                  widget.user["user"]["first_name"])));
+                                  _profile["user"]["first_name"])));
                           await http.post(
                               "https://ecothon.space/api/user/" +
-                                  widget.user["user"]["username"] +
+                                  _profile["user"]["username"] +
                                   "/unfollow",
                               headers: {
                                 "Authorization": "Bearer " +
@@ -131,14 +166,16 @@ class _UserScreenState extends State<UserScreen> {
                               });
 
                           setState(() {
-                            (widget.user["user"]["followers"] as List)
+                            (_profile["user"]["followers"] as List)
                                 .remove(username);
                             isFollowing = false;
                           });
                         },
-                        color: Colors.green.shade800,
+                        color: Colors.green.shade800.withOpacity(0.75),
                         height: 58,
                         textColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(40)),
                         child: Column(children: [
                           Icon(Icons.person_remove),
                           Text("Unfollow")
@@ -147,10 +184,10 @@ class _UserScreenState extends State<UserScreen> {
                         onPressed: () async {
                           Scaffold.of(context).showSnackBar(SnackBar(
                               content: Text("You've followed " +
-                                  widget.user["user"]["first_name"])));
+                                  _profile["user"]["first_name"])));
                           await http.post(
                               "https://ecothon.space/api/user/" +
-                                  widget.user["user"]["username"] +
+                                  _profile["user"]["username"] +
                                   "/follow",
                               headers: {
                                 "Authorization": "Bearer " +
@@ -160,14 +197,16 @@ class _UserScreenState extends State<UserScreen> {
                               });
 
                           setState(() {
-                            (widget.user["user"]["followers"] as List)
+                            (_profile["user"]["followers"] as List)
                                 .add(username);
                             isFollowing = true;
                           });
                         },
-                        color: Colors.green.shade800,
+                        color: Colors.green.shade800.withOpacity(0.75),
                         height: 58,
                         textColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(40)),
                         child: Column(children: [
                           Icon(Icons.person_add),
                           Text("Follow")
@@ -181,7 +220,7 @@ class _UserScreenState extends State<UserScreen> {
                 color: Colors.green.shade600,
                 size: 32,
               ),
-              Text(widget.user["user"]["followers"].length.toString(),
+              Text(_profile["user"]["followers"].length.toString(),
                   style: TextStyle(fontSize: 24, color: Colors.green.shade600))
             ]),
             padding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
@@ -192,9 +231,9 @@ class _UserScreenState extends State<UserScreen> {
       ListView.builder(
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
-        itemCount: widget.user["posts"].length,
+        itemCount: _profile["posts"].length,
         itemBuilder: (c, i) {
-          return FeedCard(data: FeedItemData.fromJson(widget.user["posts"][i]));
+          return FeedCard(data: FeedItemData.fromJson(_profile["posts"][i]));
         },
       )
     ]));

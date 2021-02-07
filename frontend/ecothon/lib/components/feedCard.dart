@@ -133,12 +133,12 @@ class _FeedCardState extends State<FeedCard> {
                                 ]),
                                 decoration: BoxDecoration(
                                     color: widget.data.isLiked
-                                        ? Colors.green.shade400
+                                        ? Colors.green.shade800.withOpacity(0.75)
                                         : Colors.white,
                                     border: widget.data.isLiked
                                         ? Border.all(
-                                            width: 2.0,
-                                            color: Colors.green.shade400)
+                                            width: 0.0,
+                                            color: Colors.green.shade800.withOpacity(0.75))
                                         : Border.all(
                                             width: 2.0, color: Colors.blueGrey),
                                     borderRadius: BorderRadius.circular(360)),
@@ -186,7 +186,7 @@ class _FeedCardState extends State<FeedCard> {
                                               fontWeight: FontWeight.bold)))
                                 ]),
                                 decoration: BoxDecoration(
-                                    color: Colors.green.shade400,
+                                    color: Colors.green.shade800.withOpacity(0.75),
                                     borderRadius: BorderRadius.circular(360)),
                                 padding: EdgeInsets.symmetric(
                                     vertical: 4, horizontal: 10),

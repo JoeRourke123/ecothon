@@ -73,7 +73,7 @@ class _AchievementCardState extends State<AchievementCard> {
                                     style: TextStyle(color: Colors.white))
                               ]),
                               decoration: BoxDecoration(
-                                  color: Colors.green.shade400,
+                                  color: Colors.green.shade800.withOpacity(0.75),
                                   borderRadius: BorderRadius.circular(360)),
                               padding: EdgeInsets.symmetric(
                                   vertical: 8, horizontal: 10),

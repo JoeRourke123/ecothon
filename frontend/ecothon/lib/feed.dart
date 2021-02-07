@@ -34,6 +34,8 @@ class _FeedPageState extends State<FeedPage>
 					child: Provider.of<GeneralStore>(context).feedItemData == null ? SpinKitFoldingCube(color: Colors.green.shade400) : RefreshIndicator(
 						onRefresh: _pullRefresh,
 						child: ListView.separated(
+							addAutomaticKeepAlives: true,
+							cacheExtent: 3000,
 							padding: EdgeInsets.all(8),
 							itemCount: Provider.of<GeneralStore>(context).feedItemData.length,
 							itemBuilder: (context, index) {
