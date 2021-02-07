@@ -56,20 +56,32 @@ class _FeedCardState extends State<FeedCard> {
         margin: EdgeInsets.all(20),
         child: Stack(alignment: Alignment.bottomCenter, children: [
           widget.data.picture != null
-              ? Container(
-                  child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: CachedNetworkImage(
-                          imageUrl: widget.data.picture, fit: BoxFit.contain)),
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  margin: EdgeInsets.only(bottom: 40),
-                  decoration: BoxDecoration(boxShadow: [
-                    BoxShadow(
-                        color: Colors.black26,
-                        offset: Offset(offset, offset),
-                        blurRadius: 4,
-                        spreadRadius: 4)
-                  ], borderRadius: BorderRadius.circular(20)))
+              ? GestureDetector(
+						child: Container(
+							child: ClipRRect(
+								borderRadius: BorderRadius.circular(20),
+								child: CachedNetworkImage(
+									imageUrl: widget.data.picture, fit: BoxFit.contain)),
+							width: MediaQuery.of(context).size.width * 0.8,
+							margin: EdgeInsets.only(bottom: 100),
+							decoration: BoxDecoration(boxShadow: [
+								BoxShadow(
+									color: Colors.black26,
+									offset: Offset(offset, offset),
+									blurRadius: 4,
+									spreadRadius: 4)
+							], borderRadius: BorderRadius.circular(20))),
+						onTap: () {
+							showMaterialModalBottomSheet(context: context, builder: (context) => Container(
+								color: Colors.black,
+								alignment: Alignment.center,
+								child: CachedNetworkImage(
+									imageUrl: widget.data.picture,
+									width: MediaQuery.of(context).size.width * 0.9,
+								)
+							));
+						}
+					)
               : null,
           // TODO: This will probs cause errors lmao
           GestureDetector(
@@ -133,14 +145,17 @@ class _FeedCardState extends State<FeedCard> {
                             child: Icon(Icons.more_horiz_rounded, size: 28),
                           )
                         ]),
-                    SizedBox(height: 5),
-                    Row(children: [Text(widget.data.details["caption"])]),
+                    SizedBox(height: 20),
+                   	Container(
+											alignment: Alignment.centerLeft,
+											child: Text(widget.data.details["caption"], softWrap: true,),
+										),
                     if (widget.data.achievement != null)
                       InkWell(
                         child: Container(
                             alignment: Alignment.centerLeft,
                             padding: EdgeInsets.all(10),
-                            margin: EdgeInsets.only(top: 30),
+                            margin: EdgeInsets.only(top: 25),
                             child: Row(children: [
                               Expanded(
                                   child: Text(widget.data.achievement["title"],
@@ -148,6 +163,7 @@ class _FeedCardState extends State<FeedCard> {
                                           fontWeight: FontWeight.w500,
                                           fontStyle: FontStyle.italic))),
                               Container(
+																margin: EdgeInsets.only(left: 5),
                                 alignment: Alignment.center,
                                 child: Row(children: [
                                   Icon(Icons.park,
