@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	options2 "go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -38,7 +37,6 @@ func GetFeed(c *fiber.Ctx) error {
 	options.SetSort(bson.D{{"createdat", -1}})
 	options.SetLimit(50)
 
-	var results []bson.M
 	cur, err := collection.Find(c.Context(), filter, options)
 
 	if err != nil {
@@ -49,25 +47,28 @@ func GetFeed(c *fiber.Ctx) error {
 		defer cur.Close(c.Context())
 	}
 
-	cur.All(c.Context(), &results)
+	achievementsCollection, err := utils.GetMongoDbCollection(c, "achievements")
+	if err != nil {
+		print(err.Error())
+		return fiber.ErrInternalServerError
+	}
 
-	for _, item := range results {
-		item["is_liked"] = utils.BinarySearch(item["likedby"].([]string), username)
+	returnData := make([]models.ReturnPost, cur.RemainingBatchLength())
+	i := 0
+	for cur.Next(c.Context()) {
+		var r models.ReturnPost
+		cur.Decode(&r)
 
-		id, _ := primitive.ObjectIDFromHex(item["achievement"].(string))
+		r.IsLiked = utils.BinarySearch(r.LikedBy, username)
 
-		cur, _ := collection.Find(c.Context(), bson.M{
-			"_id": id,
+		aCur := achievementsCollection.FindOne(c.Context(), bson.D{
+			{"_id", r.Achievement},
 		})
-		var achievement models.Achievement
-		cur.Decode(&achievement)
+		aCur.Decode(&r.AchievementObj)
 
-		item["achievement"] = achievement
+		returnData[i] = r
+		i++
 	}
 
-	if results == nil {
-		return fiber.ErrNotFound
-	}
-
-	return c.JSON(results)
+	return c.JSON(returnData)
 }

@@ -7,8 +7,8 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:ecothon/feed.dart';
-import 'map.dart';
 import 'profile.dart';
+import 'map.dart';
 
 GlobalKey<ScaffoldState> globalScaffold = GlobalKey<ScaffoldState>();
 
@@ -118,7 +118,6 @@ class _MyHomePageState extends State<MyHomePage> {
         return true;
       },
       child: Scaffold(
-				key: globalScaffold,
         appBar: AppBar(
           backgroundColor: Colors.white,
           title: Image.asset(
