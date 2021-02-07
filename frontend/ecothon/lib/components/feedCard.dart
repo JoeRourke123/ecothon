@@ -29,20 +29,23 @@ class _FeedCardState extends State<FeedCard> {
     return Container(
         margin: EdgeInsets.all(20),
         child: Stack(alignment: Alignment.bottomCenter, children: [
-          Container(
-              child: ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                  child: CachedNetworkImage(
-                      imageUrl: widget.data.picture, fit: BoxFit.contain)),
-              width: MediaQuery.of(context).size.width * 0.8,
-              margin: EdgeInsets.only(bottom: 30),
-              decoration: BoxDecoration(boxShadow: [
-                BoxShadow(
-                    color: Colors.black26,
-                    offset: Offset(offset, offset),
-                    blurRadius: 4,
-                    spreadRadius: 4)
-              ], borderRadius: BorderRadius.circular(20))),
+          widget.data.picture != null
+              ? Container(
+                  child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: CachedNetworkImage(
+                          imageUrl: widget.data.picture, fit: BoxFit.contain)),
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  margin: EdgeInsets.only(bottom: 30),
+                  decoration: BoxDecoration(boxShadow: [
+                    BoxShadow(
+                        color: Colors.black26,
+                        offset: Offset(offset, offset),
+                        blurRadius: 4,
+                        spreadRadius: 4)
+                  ], borderRadius: BorderRadius.circular(20)))
+              : null,
+          // TODO: This will probs cause errors lmao
           GestureDetector(
               child: Container(
                   margin: EdgeInsets.only(top: 20),
@@ -111,13 +114,14 @@ class _FeedCardState extends State<FeedCard> {
                 });
                 try {
                   http.Response res = await http.post(
-                      "https://ecothon.space/api/" +
+                      "https://ecothon.space/api/posts/" +
                           widget.data.id +
                           "/" +
-                          endpoint);
+                          endpoint,
+                  headers: {"Authorization": "Bearer " + Provider.of<GeneralStore>(context, listen: false).token});
                   if (res.statusCode == 200) {
                     Scaffold.of(context).showSnackBar(
-                        SnackBar(content: Text(endpoint + "ed post")));
+                        SnackBar(content: Text(endpoint + "d post")));
                   } else {
                     try {
                       dynamic decoded = jsonDecode(res.body);

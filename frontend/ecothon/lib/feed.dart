@@ -96,7 +96,7 @@ class _FeedPageState extends State<FeedPage>
 class FeedItemData {
   final String id;
   final String user;
-  final String achievement;
+  final Map<String, dynamic> achievement;
   final String type;
   final List<Map<String, dynamic>> comments;
   final Map<String, dynamic> location;
@@ -123,13 +123,13 @@ class FeedItemData {
     return FeedItemData(
         id: json["_id"],
         user: json["user"],
-        achievement: json["achievement"],
+        achievement: Map<String,dynamic>.from(json["achievement"]),
         type: json["type"],
         comments: List<Map<String, dynamic>>.from(json["comments"]),
         location: json["geolocation"],
         details: json["details"],
-        createdAt: json["created_at"],
-        likedby: List<String>.from(json["likedby"]),
+        createdAt: DateTime.parse(json["created_at"]),
+        likedby: List<String>.from(json["liked_by"]),
         picture: json["picture"],
         isLiked: json["is_liked"]);
   }
