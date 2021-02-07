@@ -139,7 +139,6 @@ class _MyHomePageState extends State<MyHomePage> {
             FeedPage(),
             AchievementsPage(),
             ProfilePage(),
-            MapPage(),
           ],
         ),
         bottomNavigationBar: Container(
@@ -180,14 +179,6 @@ class _MyHomePageState extends State<MyHomePage> {
                             text: 'Profile',
                             backgroundColor:
                                 Colors.green.shade800.withOpacity(0.75),
-                            textColor: Colors.white,
-                            iconActiveColor: Colors.white,
-                          ),
-                          GButton(
-                            icon: Icons.map,
-                            text: 'Map',
-                            backgroundColor:
-                            Colors.green.shade800.withOpacity(0.75),
                             textColor: Colors.white,
                             iconActiveColor: Colors.white,
                           ),

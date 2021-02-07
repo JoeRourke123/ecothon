@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ecothon/components/achievementCard.dart';
+import 'package:ecothon/map.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
@@ -45,19 +46,65 @@ class _AchievementsPageState extends State<AchievementsPage>
     return Container(
         child: RefreshIndicator(
       onRefresh: _getAchievements,
-      child: ListView.builder(
+      child: ListView(
           padding: EdgeInsets.only(top: 20),
-          itemCount: Provider.of<GeneralStore>(context)
-              .achievementData
-              .length,
-          itemBuilder: (context, index) {
-            return Consumer<GeneralStore>(
-                builder: (context, achievement, child) {
-              return AchievementCard(
-                  achievement: Provider.of<GeneralStore>(context)
-                      .achievementData[index]);
-            });
-          }),
+          shrinkWrap: true,
+          children: [
+            Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+              FlatButton.icon(
+                onPressed: () {},
+                color: Colors.green.shade800.withOpacity(0.7),
+								padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+								shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                icon: Icon(Icons.leaderboard_rounded),
+                label: Text("Leaderboard"),
+                textColor: Colors.white,
+              ),
+              FlatButton.icon(
+                onPressed: () {
+                	Navigator.of(context).push(MaterialPageRoute(
+										builder: (context) => Scaffold(
+											appBar: AppBar(
+												backgroundColor: Colors.white,
+												title: Image.asset(
+													'assets/images/logo.png',
+													fit: BoxFit.fitHeight,
+													width: 32,
+												),
+												centerTitle: true,
+												shape:
+												RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+												toolbarHeight: 64,
+												elevation: 6.0,
+											),
+											body: MapPage()
+										)
+									));
+								},
+                color: Colors.green.shade800.withOpacity(0.7),
+                icon: Icon(Icons.map_rounded),
+								padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+								shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+								label: Text("Map"),
+                textColor: Colors.white,
+              )
+            ]),
+            SizedBox(height: 10),
+            ListView.builder(
+              itemCount:
+                  Provider.of<GeneralStore>(context).achievementData.length,
+              itemBuilder: (context, index) {
+                return Consumer<GeneralStore>(
+                    builder: (context, achievement, child) {
+                  return AchievementCard(
+                      achievement: Provider.of<GeneralStore>(context)
+                          .achievementData[index]);
+                });
+              },
+              physics: NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+            )
+          ]),
     ));
   }
 
