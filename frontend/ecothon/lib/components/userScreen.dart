@@ -2,6 +2,8 @@ import 'package:ecothon/components/feedCard.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../feed.dart';
+
 class UserScreen extends StatefulWidget {
   final Map<String, dynamic> user;
 
@@ -101,7 +103,8 @@ class _UserScreenState extends State<UserScreen> {
         physics: NeverScrollableScrollPhysics(),
         itemCount: widget.user["posts"].length,
         itemBuilder: (c, i) {
-          return FeedCard(data: widget.user["posts"][i]);
+
+          return FeedCard(data: FeedItemData.fromJson(widget.user["posts"][i]));
         },
       )
     ]));

@@ -53,6 +53,8 @@ class _FeedPageState extends State<FeedPage>
       final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
       Position position = await geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.best);
+
+      Provider.of<GeneralStore>(context, listen: false).coords = [position.longitude, position.latitude];
       http.Response res = await http.post('https://ecothon.space/api/posts',
           body: jsonEncode({
             "type": "Point",

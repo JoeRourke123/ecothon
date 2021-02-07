@@ -12,6 +12,8 @@ class GeneralStore extends ChangeNotifier {
   LatLng mapPos;
   double mapZoom;
 
+  List<double> coords;
+
   void setLoginData(String username, String token) {
     this.username = username;
     this.token = token;
