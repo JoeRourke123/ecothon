@@ -81,7 +81,7 @@ class _AchievementsPageState extends State<AchievementsPage>
 										)
 									));
 								},
-                color: Colors.green.shade800.withOpacity(0.7),
+                color: Colors.green.shade800.withOpacity(0.75),
                 icon: Icon(Icons.map_rounded),
 								padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
 								shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
