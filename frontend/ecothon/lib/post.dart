@@ -136,6 +136,9 @@ class _PostPageState extends State<PostPage> {
                 onPressed: () async {
                   PickedFile file =
                       await ImagePicker().getImage(source: ImageSource.gallery);
+                  setState(() {
+                    
+                  });
                   image = File(file.path);
                 },
                 child: Text("Upload photo"),

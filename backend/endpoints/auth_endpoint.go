@@ -224,10 +224,12 @@ func SetProfilePicture(c *fiber.Ctx) error {
 		return fiber.ErrInternalServerError
 	}
 
-	collection.UpdateOne(c.Context(), bson.M{
+	_, err = collection.UpdateOne(c.Context(), bson.M{
 		"username": username,
 	}, bson.M{
-		"profilepicture": parsed.ProfilePicture,
+		"$set": bson.M{
+			"profilepicture": parsed.ProfilePicture,
+		},
 	})
 
 	return c.SendStatus(fiber.StatusOK)
