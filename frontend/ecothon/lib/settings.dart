@@ -1,10 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 
-class ProfilePage extends StatelessWidget {
+enum WidgetMarker { posts, followers, following }
+
+class ProfilePage extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() => ProfilePageState();
+}
+
+class ProfilePageState extends State<ProfilePage>
+    with SingleTickerProviderStateMixin<ProfilePage> {
+  WidgetMarker selectedWidgetMarker = WidgetMarker.posts;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return ListView(
       children: <Widget>[
         SizedBox(height: 50),
         Container(
@@ -14,15 +34,18 @@ class ProfilePage extends StatelessWidget {
           decoration: BoxDecoration(
             image: DecorationImage(
               image: AssetImage('assets/images/shrek.jpg'),
-              fit: BoxFit.fill,
+              fit: BoxFit.contain,
             ),
             shape: BoxShape.circle,
           ),
         ),
         SizedBox(height: 20),
-        Text('Shrek Shrek',
-            style:
-                DefaultTextStyle.of(context).style.apply(fontSizeFactor: 2.0)),
+        Center(
+          child: Text('Shrek Shrek',
+              style: DefaultTextStyle.of(context)
+                  .style
+                  .apply(fontSizeFactor: 2.0)),
+        ),
         SizedBox(height: 20),
         Row(
           children: <Widget>[
@@ -35,10 +58,9 @@ class ProfilePage extends StatelessWidget {
                   color: Colors.white,
                   textColor: Colors.black,
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => TempLoginPage()),
-                    );
+                    setState(() {
+                      selectedWidgetMarker = WidgetMarker.posts;
+                    });
                   }),
             ),
             Expanded(
@@ -50,10 +72,9 @@ class ProfilePage extends StatelessWidget {
                   color: Colors.white,
                   textColor: Colors.black,
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => TempLoginPage()),
-                    );
+                    setState(() {
+                      selectedWidgetMarker = WidgetMarker.followers;
+                    });
                   }),
             ),
             Expanded(
@@ -65,15 +86,52 @@ class ProfilePage extends StatelessWidget {
                   color: Colors.white,
                   textColor: Colors.black,
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => TempLoginPage()),
-                    );
+                    setState(() {
+                      selectedWidgetMarker = WidgetMarker.following;
+                    });
                   }),
             )
           ],
         ),
+        FutureBuilder(
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            return getCustomContainer();
+          },
+        )
       ],
+    );
+  }
+
+  Widget getCustomContainer() {
+    switch (selectedWidgetMarker) {
+      case WidgetMarker.posts:
+        return getPostContainer();
+      case WidgetMarker.followers:
+        return getFollowersContainer();
+      case WidgetMarker.following:
+        return getFollowingContainer();
+    }
+    return getPostContainer();
+  }
+
+  Widget getPostContainer() {
+    return Container(
+      color: Colors.red,
+      height: 100,
+    );
+  }
+
+  Widget getFollowersContainer() {
+    return Container(
+      color: Colors.green,
+      height: 400,
+    );
+  }
+
+  Widget getFollowingContainer() {
+    return Container(
+      color: Colors.blue,
+      height: 1600,
     );
   }
 }
