@@ -3,6 +3,7 @@ import 'package:ecothon/login.dart';
 import 'package:flutter/material.dart';
 import 'package:ecothon/achievements.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:ecothon/feed.dart';
@@ -13,7 +14,8 @@ main() async {
   GeneralStore store = GeneralStore();
   final storage = new FlutterSecureStorage();
 
-  bool isLoggedIn = await storage.containsKey(key: "username") && await storage.containsKey(key: "token");
+  bool isLoggedIn = await storage.containsKey(key: "username") &&
+      await storage.containsKey(key: "token");
   if (isLoggedIn) {
     String username = await storage.read(key: "username");
     String token = await storage.read(key: "token");
@@ -95,32 +97,80 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-        onWillPop: () async {
-          if (_selectedIndex != 1) {
-            _onItemTapped(1);
-            return false;
-          }
-          return true;
-        },
-        child: Scaffold(
-          appBar: AppBar(
-            title: Text(_navBarItems[_selectedIndex].label),
+      onWillPop: () async {
+        if (_selectedIndex != 1) {
+          _onItemTapped(1);
+          return false;
+        }
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          title: Image.asset(
+            'assets/images/logo.png',
+            fit: BoxFit.fitHeight,
+            width: 32,
           ),
-          body: PageView(
-            controller: _controller,
-            onPageChanged: _onPagedChanged,
-            children: [
-              FeedPage(),
-              AchievementsPage(),
-              ProfilePage(),
+          centerTitle: true,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          toolbarHeight: 64,
+          elevation: 6.0,
+        ),
+        body: PageView(
+          controller: _controller,
+          onPageChanged: _onPagedChanged,
+          children: [
+            FeedPage(),
+            AchievementsPage(),
+            ProfilePage(),
+          ],
+        ),
+        bottomNavigationBar: Container(
+		decoration: BoxDecoration(color: Colors.white, boxShadow: [
+		BoxShadow(blurRadius: 20, color: Colors.black.withOpacity(.1))
+		]),
+		child: SafeArea(
+		child: Padding(
+		padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8),
+		child: GNav(
+            gap: 8,
+            activeColor: Colors.black,
+            iconSize: 24,
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+            duration: Duration(milliseconds: 400),
+            tabBackgroundColor: Colors.grey[100],
+            tabs: [
+              GButton(
+                icon: Icons.view_day,
+                text: 'Feed',
+								backgroundColor: Colors.green.shade800.withOpacity(0.75),
+								textColor: Colors.white,
+								iconActiveColor: Colors.white,
+              ),
+              GButton(
+                icon: Icons.stars_rounded,
+                text: 'Achievements',
+								backgroundColor: Colors.green.shade800.withOpacity(0.75),
+								textColor: Colors.white,
+								iconActiveColor: Colors.white,
+              ),
+              GButton(
+                icon: Icons.face_rounded,
+                text: 'Profile',
+								backgroundColor: Colors.green.shade800.withOpacity(0.75),
+								textColor: Colors.white,
+								iconActiveColor: Colors.white,
+              ),
             ],
-          ),
-          bottomNavigationBar: BottomNavigationBar(
-            items: _navBarItems,
-            currentIndex: _selectedIndex,
-            selectedItemColor: Colors.green[800],
-            onTap: _onItemTapped,
-          ),
-        ));
+            selectedIndex: _selectedIndex,
+            onTabChange: (index) {
+              setState(() {
+                _selectedIndex = index;
+              });
+            })))),
+      ),
+    );
   }
 }
