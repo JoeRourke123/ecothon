@@ -86,7 +86,7 @@ class _LoginPageState extends State<LoginPage> {
             colors: [Colors.green[100], Colors.green[800]],
           ),
         ),
-        alignment:Alignment.center,
+        alignment: Alignment.center,
         padding: EdgeInsets.all(50),
         child: Form(
             key: _formKey,
@@ -115,7 +115,7 @@ class _LoginPageState extends State<LoginPage> {
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(15.0),
                         borderSide:
-                        BorderSide(color: Colors.grey[700], width: 1.0),
+                            BorderSide(color: Colors.grey[700], width: 1.0),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(15.0),
@@ -150,7 +150,7 @@ class _LoginPageState extends State<LoginPage> {
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(15.0),
                         borderSide:
-                        BorderSide(color: Colors.grey[700], width: 1.0),
+                            BorderSide(color: Colors.grey[700], width: 1.0),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(15.0),
@@ -169,12 +169,17 @@ class _LoginPageState extends State<LoginPage> {
                   SizedBox(
                     height: 10,
                   ),
-                  MaterialButton(
-                    child: Text("Login"),
-                    onPressed: _login,
-                    textColor: Colors.white,
-                    color: Colors.grey[700],
-                  ),
+                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                    MaterialButton(
+                      child: Text("Login"),
+                      onPressed: _login,
+                      textColor: Colors.white,
+                      color: Colors.grey[700],
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                    ),
+                  ]),
                   MaterialButton(
                     onPressed: () {
                       Navigator.of(context)

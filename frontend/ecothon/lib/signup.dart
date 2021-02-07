@@ -42,7 +42,7 @@ class _SignupPageState extends State<SignupPage> {
                   }));
           _scaffoldKey.currentState.hideCurrentSnackBar();
           if (res.statusCode == 200) {
-          	print(res.body);
+            print(res.body);
             var data = jsonDecode(res.body);
             String username = data["user"]["username"];
             String token = data["auth"];
@@ -105,7 +105,7 @@ class _SignupPageState extends State<SignupPage> {
             key: _formKey,
             child: Center(
                 child: ListView(
-                  shrinkWrap: true,
+              shrinkWrap: true,
               children: <Widget>[
                 Container(
                   child: Image.asset(
@@ -311,12 +311,19 @@ class _SignupPageState extends State<SignupPage> {
                 SizedBox(
                   height: 10,
                 ),
-                MaterialButton(
-                  child: Text("Create user"),
-                  onPressed: _createUser,
-                  textColor: Colors.white,
-                  color: Colors.grey[700],
-                ),
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      MaterialButton(
+                        child: Text("Create user"),
+                        onPressed: _createUser,
+                        textColor: Colors.white,
+                        color: Colors.grey[700],
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                      )
+                    ]),
               ],
             )),
           )),

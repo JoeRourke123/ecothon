@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ecothon/components/achievementCard.dart';
+import 'package:ecothon/leaderboard.dart';
 import 'package:ecothon/map.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -52,7 +53,26 @@ class _AchievementsPageState extends State<AchievementsPage>
           children: [
             Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
               FlatButton.icon(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => Scaffold(
+                          appBar: AppBar(
+                            backgroundColor: Colors.white,
+                            title: Image.asset(
+                              'assets/images/logo.png',
+                              fit: BoxFit.fitHeight,
+                              width: 32,
+                            ),
+                            centerTitle: true,
+                            shape:
+                            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                            toolbarHeight: 64,
+                            elevation: 6.0,
+                          ),
+                          body: LeaderboardPage()
+                      )
+                  ));
+                },
                 color: Colors.green.shade800.withOpacity(0.7),
 								padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
 								shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),

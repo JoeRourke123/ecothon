@@ -132,7 +132,6 @@ class _PostPageState extends State<PostPage> {
           },
         ),
         backgroundColor: Colors.white,
-        foregroundColor: Colors.blueGrey,
         title: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.start,

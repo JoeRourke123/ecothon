@@ -10,6 +10,7 @@ class GeneralStore extends ChangeNotifier {
   String token;
   List<FeedItemData> feedItemData;
   List<Map<String, dynamic>> achievementData = [];
+  List<Map<String, dynamic>> leaderboardData;
   LatLng mapPos;
   double mapZoom;
   List<Marker> markers = [];
@@ -23,6 +24,11 @@ class GeneralStore extends ChangeNotifier {
 
   void setAchievementData(List<Map<String, dynamic>> items) {
     achievementData = items;
+    notifyListeners();
+  }
+
+  void setLeaderboardData(List<Map<String, dynamic>> items) {
+    leaderboardData = items;
     notifyListeners();
   }
 
