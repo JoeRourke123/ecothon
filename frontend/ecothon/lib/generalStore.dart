@@ -8,7 +8,8 @@ class GeneralStore extends ChangeNotifier {
   String username;
   String token;
   List<FeedItemData> feedItemData = [];
-  LatLng mapPos;double mapZoom;
+  LatLng mapPos;
+  double mapZoom;
 
   void setLoginData(String username, String token) {
     this.username = username;
