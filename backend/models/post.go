@@ -12,35 +12,32 @@ type Location struct {
 }
 
 type Comment struct {
-	User        string    `json:"user,omitempty"`
-	Comment     string    `json:"comment,omitempty"`
-	CommentedAt time.Time `json:"commented_at,omitempty"`
+	User        string    `json:"user"  bson:"user"`
+	Comment     string    `json:"comment"  bson:"comment"`
+	CommentedAt time.Time `json:"commented_at" bson:"commented_at"`
 }
 
 type Post struct {
-	_id         primitive.ObjectID `json:"id,omitempty"`
-	User        string             `json:"user"`
-	Picture     string             `json:"picture,omitempty"`
-	Achievement primitive.ObjectID `json:"achievement,omitempty"`
-	Type        string             `json:"type,omitempty"`
-	Comments    []Comment          `json:"comments,omitempty"`
-	LikedBy     []string           `json:"liked_by"`
-	Geolocation Location           `json:"geolocation"`
-	Details     bson.M             `json:"details,omitempty"`
-	CreatedAt   time.Time          `json:"created_at,omitempty"`
+	ID          primitive.ObjectID `json:"id" bson:"_id"`
+	User        string             `json:"user" bson:"user"`
+	Picture     string             `json:"picture" bson:"picture"`
+	Achievement primitive.ObjectID `json:"achievement" bson:"achievement"`
+	Type        string             `json:"type" bson:"type"`
+	Comments    []Comment          `json:"comments" bson:"comments"`
+	LikedBy     []string           `json:"liked_by" bson:"liked_by"`
+	Geolocation Location           `json:"geolocation" bson:"geolocation"`
+	Details     bson.M             `json:"details" bson:"details"`
+	CreatedAt   time.Time          `json:"created_at" bson:"created_at"`
 }
 
-type ReturnPost struct {
-	ID            primitive.ObjectID `json:"_id"`
-	User           string             `json:"user"`
-	Picture        string             `json:"picture"`
-	AchievementObj bson.M        `json:"achievement"`
-	Achievement    primitive.ObjectID `json:"achievement_id"`
-	Type           string             `json:"type"`
-	Comments       []Comment          `json:"comments"`
-	LikedBy        []string           `json:"liked_by"`
-	IsLiked        bool               `json:"is_liked"`
-	Geolocation    Location           `json:"geolocation"`
-	Details        bson.M             `json:"details"`
-	CreatedAt      time.Time          `json:"created_at"`
+type SimplePost struct {
+	ID          primitive.ObjectID `json:"id" bson:"_id"`
+	User        string             `json:"user" bson:"user"`
+	Picture     string             `json:"picture" bson:"picture"`
+	Achievement Achievement        `json:"achievement" bson:"achievement"`
+	Type        string             `json:"type" bson:"type"`
+	LikeCount   int16              `json:"like_count" bson:"like_count"`
+	Geolocation Location           `json:"geolocation" bson:"geolocation"`
+	Details     bson.M             `json:"details" bson:"details"`
+	CreatedAt   time.Time          `json:"created_at" bson:"created_at"`
 }
