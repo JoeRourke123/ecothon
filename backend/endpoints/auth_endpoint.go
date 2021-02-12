@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
 	"time"
 )
@@ -48,22 +49,22 @@ func CreateUser(c *fiber.Ctx) error {
 	user.AccountCreated = time.Now()
 	user.Points = 0
 
-	user.Achievements = []bson.M{}
-	user.Followers = []string{}
-	user.Following = []string{}
+	user.Achievements = []models.UserAchievement{}
+	user.Followers = []primitive.ObjectID{}
+	user.Following = []primitive.ObjectID{}
 
 	user.CurrentCarbon = user.StartingCarbon
 
 	user.Password = generateHash([]byte(user.Password))
 
-	_, err = collection.InsertOne(c.Context(), user)
+	newCur, err := collection.InsertOne(c.Context(), user)
 	if err != nil {
 		return fiber.ErrInternalServerError
 	}
 
 
 	t := utils.Generate(&utils.TokenPayload{
-		Username: user.Username,
+		ID: newCur.InsertedID.(primitive.ObjectID),
 	})
 
 	return c.JSON(
@@ -122,7 +123,7 @@ func LoginUser(ctx *fiber.Ctx) error {
 	}
 
 	t := utils.Generate(&utils.TokenPayload{
-		Username: user.Username,
+		ID: user.ID,
 	})
 
 	return ctx.JSON(
@@ -143,28 +144,28 @@ func LoginUser(ctx *fiber.Ctx) error {
 
 func UserProfile(c *fiber.Ctx) error {
 	var currentUser models.User
-	currentUsername := c.Locals("USER").(string)
-	utils.GetUser(currentUsername, c, &currentUser)
+	currentUID, _ := primitive.ObjectIDFromHex(c.Locals("USER").(string))
+	utils.GetUser(currentUID, c, &currentUser)
 
 	var user models.User
-	viewingUsername := c.Params("username")
-	utils.GetUser(viewingUsername, c, &user)
+	viewingUID, _ := primitive.ObjectIDFromHex(c.Params("user_id"))
+	utils.GetUser(viewingUID, c, &user)
 
 	var isFollowing bool
 	if len(user.Followers) < len(currentUser.Following) {
-		isFollowing = utils.BinarySearch(user.Followers, currentUsername)
+		isFollowing = utils.BinarySearch(user.Followers, currentUID)
 	} else {
-		isFollowing = utils.BinarySearch(currentUser.Following, c.Params("username"))
+		isFollowing = utils.BinarySearch(currentUser.Following, viewingUID)
 	}
 
-	var posts []models.ReturnPost
-	utils.GetPosts(viewingUsername, &posts, c)
+	var posts []models.SerialisedPost
+	utils.GetPosts(viewingUID, &posts, c, &currentUser)
 
 	if user.Followers == nil {
-		user.Followers = make([]string, 0)
+		user.Followers = make([]primitive.ObjectID, 0)
 	}
 	if user.Following == nil {
-		user.Following = make([]string, 0)
+		user.Following = make([]primitive.ObjectID, 0)
 	}
 
 	print(user.Username)
@@ -178,30 +179,30 @@ func UserProfile(c *fiber.Ctx) error {
 
 func UserFollow(c *fiber.Ctx) error {
 	var currentUser models.User
-	currentUsername := c.Locals("USER").(string)
-	utils.GetUser(currentUsername, c, &currentUser)
+	currentUID, _ := primitive.ObjectIDFromHex(c.Locals("USER").(string))
+	utils.GetUser(currentUID, c, &currentUser)
 
 	var user models.User
-	viewingUsername := c.Params("username")
-	utils.GetUser(viewingUsername, c, &user)
+	viewingUID, _ := primitive.ObjectIDFromHex(c.Params("user_id"))
+	utils.GetUser(viewingUID, c, &user)
 
 	collection, _ := utils.GetMongoDbCollection(c, "users")
 	collection.UpdateOne(c.Context(), bson.M{
-		"username": currentUsername,
+		"_id": currentUID,
 	}, bson.M{
 		"$push": bson.M{
 			"following": bson.M{
-				"$each": bson.A{ viewingUsername },
+				"$each": bson.A{ viewingUID },
 				"$sort": 1,
 			},
 		},
 	})
 	collection.UpdateOne(c.Context(), bson.M{
-		"username": viewingUsername,
+		"_id": viewingUID,
 	}, bson.M{
 		"$push": bson.M{
 			"followers": bson.M{
-				"$each": bson.A{ currentUsername },
+				"$each": bson.A{ currentUID },
 				"$sort": 1,
 			},
 		},
@@ -212,8 +213,9 @@ func UserFollow(c *fiber.Ctx) error {
 
 func SetProfilePicture(c *fiber.Ctx) error {
 	var user models.User
-	username := c.Locals("USER").(string)
-	utils.GetUser(username, c, &user)
+	userID, _ := primitive.ObjectIDFromHex(c.Locals("USER").(string))
+	utils.GetUser(userID, c, &user)
+
 
 	collection, err := utils.GetMongoDbCollection(c, "users")
 
@@ -225,10 +227,10 @@ func SetProfilePicture(c *fiber.Ctx) error {
 	}
 
 	_, err = collection.UpdateOne(c.Context(), bson.M{
-		"username": username,
+		"_id": userID,
 	}, bson.M{
 		"$set": bson.M{
-			"profilepicture": parsed.ProfilePicture,
+			"profile_picture": parsed.ProfilePicture,
 		},
 	})
 

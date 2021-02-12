@@ -5,13 +5,14 @@ import (
 	"ecothon/utils"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	options2 "go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func AllLeaderboard(c *fiber.Ctx) error {
 	var user models.User
-	var username string = c.Locals("USER").(string)
-	utils.GetUser(username, c, &user)
+	userID, _ := primitive.ObjectIDFromHex(c.Locals("USER").(string))
+	utils.GetUser(userID, c, &user)
 
 	collection, err := utils.GetMongoDbCollection(c, "users")
 
@@ -30,10 +31,13 @@ func AllLeaderboard(c *fiber.Ctx) error {
 		return fiber.ErrBadRequest
 	}
 
-	results := make([]models.User, cur.RemainingBatchLength())
+	results := make([]models.SerialisedUser, cur.RemainingBatchLength())
 	i := 0
 	for cur.Next(c.Context()) {
-		cur.Decode(&(results[i]))
+		var u models.User
+		cur.Decode(&u)
+
+		results[i] = utils.GetSerialisedUser(&u, &user)
 		i++
 	}
 
@@ -44,8 +48,8 @@ func AllLeaderboard(c *fiber.Ctx) error {
 
 func FollowingLeaderboard(c *fiber.Ctx) error {
 	var user models.User
-	var username string = c.Locals("USER").(string)
-	utils.GetUser(username, c, &user)
+	userID, _ := primitive.ObjectIDFromHex(c.Locals("USER").(string))
+	utils.GetUser(userID, c, &user)
 
 	collection, err := utils.GetMongoDbCollection(c, "users")
 
@@ -55,9 +59,10 @@ func FollowingLeaderboard(c *fiber.Ctx) error {
 
 	findOptions := options2.Find()
 	findOptions.SetSort(bson.M{ "points": -1 })
+	findOptions.SetLimit(50)
 
 	cur, err := collection.Find(c.Context(), bson.M{
-		"username": bson.M{
+		"_id": bson.M{
 			"$in": user.Following,
 		},
 	}, findOptions)
@@ -67,10 +72,13 @@ func FollowingLeaderboard(c *fiber.Ctx) error {
 		return fiber.ErrBadRequest
 	}
 
-	results := make([]models.User, cur.RemainingBatchLength())
+	results := make([]models.SerialisedUser, cur.RemainingBatchLength())
 	i := 0
 	for cur.Next(c.Context()) {
-		cur.Decode(&(results[i]))
+		var u models.User
+		cur.Decode(&u)
+
+		results[i] = utils.GetSerialisedUser(&u, &user)
 		i++
 	}
 

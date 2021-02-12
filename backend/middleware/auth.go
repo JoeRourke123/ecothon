@@ -30,7 +30,7 @@ func Auth(c *fiber.Ctx) error {
 		return fiber.ErrUnauthorized
 	}
 
-	c.Locals("USER", user.Username)
+	c.Locals("USER", user.ID)
 
 	return c.Next()
 }

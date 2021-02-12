@@ -3,6 +3,7 @@ package utils
 import (
 	"errors"
 	"fmt"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -13,7 +14,7 @@ const TOKENKEY string = "hello"
 
 // TokenPayload defines the payload for the token
 type TokenPayload struct {
-	Username string
+	ID primitive.ObjectID
 }
 
 // Generate generates the jwt token based on payload
@@ -26,7 +27,7 @@ func Generate(payload *TokenPayload) string {
 
 	t := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"exp": time.Now().Add(v).Unix(),
-		"Username":  payload.Username,
+		"ID":  payload.ID,
 	})
 
 	token, err := t.SignedString([]byte(TOKENKEY))
@@ -69,12 +70,12 @@ func Verify(token string) (*TokenPayload, error) {
 	}
 
 	// Getting ID, it's an interface{} so I need to cast it to uint
-	id, ok := claims["Username"].(string)
+	id, ok := claims["ID"].(primitive.ObjectID)
 	if !ok {
 		return nil, errors.New("Something went wrong")
 	}
 
 	return &TokenPayload{
-		Username: id,
+		ID: id,
 	}, nil
 }

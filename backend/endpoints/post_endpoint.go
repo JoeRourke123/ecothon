@@ -14,8 +14,8 @@ import (
 
 func CreatePost(c *fiber.Ctx) error {
 	var user models.User
-	var username string = c.Locals("USER").(string)
-	utils.GetUser(username, c, &user)
+	userID, _ := primitive.ObjectIDFromHex(c.Locals("USER").(string))
+	utils.GetUser(userID, c, &user)
 
 	now := time.Now()
 
@@ -30,13 +30,13 @@ func CreatePost(c *fiber.Ctx) error {
 
 	post.Geolocation.Type = "Point"
 	post.CreatedAt = now
-	post.User = username
+	post.User = userID
 
 	if post.Comments == nil {
 		post.Comments = []models.Comment{}
 	}
 	if post.LikedBy == nil {
-		post.LikedBy = []string{}
+		post.LikedBy = []primitive.ObjectID{}
 	}
 
 	res, err := collection.InsertOne(c.Context(), post)
@@ -45,7 +45,16 @@ func CreatePost(c *fiber.Ctx) error {
 	}
 
 	if post.Achievement != primitive.NilObjectID {
-		err = utils.AddUserAchievement(username, res.InsertedID.(primitive.ObjectID), post.Achievement, c, now)
+		var achievement models.Achievement
+		utils.GetAchievement(post.Achievement, c, &achievement)
+
+		userAchievement := models.UserAchievement{
+			AchievedAt:  time.Now(),
+			Achievement: achievement.ID,
+			Post:        res.InsertedID.(primitive.ObjectID),
+		}
+
+		err := utils.AddUserAchievement(user, c, &achievement, userAchievement)
 
 		if err != nil {
 			return err
@@ -57,8 +66,8 @@ func CreatePost(c *fiber.Ctx) error {
 
 func LikePost(c *fiber.Ctx) error {
 	var user models.User
-	var username string = c.Locals("USER").(string)
-	utils.GetUser(username, c, &user)
+	userID, _ := primitive.ObjectIDFromHex(c.Locals("USER").(string))
+	utils.GetUser(userID, c, &user)
 
 	id, _ := primitive.ObjectIDFromHex(c.Params("id"))
 
@@ -73,8 +82,8 @@ func LikePost(c *fiber.Ctx) error {
 	}, bson.D{
 		{
 			"$push", bson.D{
-			{"likedby", bson.D{
-				{"$each", bson.A{username}},
+			{"liked_by", bson.D{
+				{"$each", bson.A{userID}},
 				{"$sort", 1},
 			}},
 		},
@@ -91,8 +100,8 @@ func LikePost(c *fiber.Ctx) error {
 
 func UnlikePost(c *fiber.Ctx) error {
 	var user models.User
-	var username string = c.Locals("USER").(string)
-	utils.GetUser(username, c, &user)
+	userID, _ := primitive.ObjectIDFromHex(c.Locals("USER").(string))
+	utils.GetUser(userID, c, &user)
 
 	id, _ := primitive.ObjectIDFromHex(c.Params("id"))
 
@@ -107,7 +116,7 @@ func UnlikePost(c *fiber.Ctx) error {
 	}, bson.D{
 		{
 			"$pull", bson.D{
-			{"likedby", username},
+			{"liked_by", userID},
 		},
 		},
 	})
@@ -117,14 +126,14 @@ func UnlikePost(c *fiber.Ctx) error {
 
 func CommentPost(c *fiber.Ctx) error {
 	var user models.User
-	var username string = c.Locals("USER").(string)
-	utils.GetUser(username, c, &user)
+	userID, _ := primitive.ObjectIDFromHex(c.Locals("USER").(string))
+	utils.GetUser(userID, c, &user)
 
 	id, _ := primitive.ObjectIDFromHex(c.Params("id"))
 
 	var comment models.Comment
 	json.Unmarshal(c.Body(), &comment)
-	comment.User = username
+	comment.User = userID
 	comment.CommentedAt = time.Now()
 
 	collection, err := utils.GetMongoDbCollection(c, "posts")

@@ -6,6 +6,7 @@ import (
 	"ecothon/utils"
 	"encoding/json"
 	"fmt"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"os"
 	"strconv"
 	"strings"
@@ -26,8 +27,8 @@ type upload struct {
 // Digital Ocean Spaces bucket
 func CreateUploadURL(c *fiber.Ctx) error {
 	var user models.User
-	var username string = c.Locals("USER").(string)
-	utils.GetUser(username, c, &user)
+	userID, _ := primitive.ObjectIDFromHex(c.Locals("USER").(string))
+	utils.GetUser(userID, c, &user)
 
 	var up upload
 	json.Unmarshal([]byte(c.Body()), &up)
@@ -74,8 +75,8 @@ func CreateUploadURL(c *fiber.Ctx) error {
 // UploadImage uploads an image to S3 directly, i.e. not doing it client side
 func UploadImage(c *fiber.Ctx) error {
 	var user models.User
-	var username string = c.Locals("USER").(string)
-	utils.GetUser(username, c, &user)
+	userID, _ := primitive.ObjectIDFromHex(c.Locals("USER").(string))
+	utils.GetUser(userID, c, &user)
 
 	fmt.Println(string(c.Request().Header.ContentType()))
 

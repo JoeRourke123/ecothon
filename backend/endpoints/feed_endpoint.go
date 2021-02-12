@@ -4,6 +4,7 @@ import (
 	"ecothon/models"
 	"ecothon/utils"
 	"encoding/json"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
@@ -14,8 +15,8 @@ const MAX_DISTANCE int = 1000000
 
 func GetFeed(c *fiber.Ctx) error {
 	var user models.User
-	var username string = c.Locals("USER").(string)
-	utils.GetUser(username, c, &user)
+	userID, _ := primitive.ObjectIDFromHex(c.Locals("USER").(string))
+	utils.GetUser(userID, c, &user)
 
 	collection, err := utils.GetMongoDbCollection(c, "posts")
 	if err != nil {
@@ -34,7 +35,7 @@ func GetFeed(c *fiber.Ctx) error {
 	}
 
 	options := options2.Find()
-	options.SetSort(bson.D{{"createdat", -1}})
+	options.SetSort(bson.D{{"created_at", -1}})
 	options.SetLimit(50)
 
 	cur, err := collection.Find(c.Context(), filter, options)
@@ -47,27 +48,25 @@ func GetFeed(c *fiber.Ctx) error {
 		defer cur.Close(c.Context())
 	}
 
-	achievementsCollection, err := utils.GetMongoDbCollection(c, "achievements")
-	if err != nil {
-		print(err.Error())
-		return fiber.ErrInternalServerError
-	}
-
-	returnData := make([]models.ReturnPost, cur.RemainingBatchLength())
+	returnData := make([]models.SerialisedPost, cur.RemainingBatchLength())
 	i := 0
 	for cur.Next(c.Context()) {
-		var r models.ReturnPost
-		cur.Decode(&r)
+		var post models.Post
+		cur.Decode(&post)
 
-		r.ID = cur.Current.Index(0).Value().ObjectID()
-		r.IsLiked = utils.BinarySearch(r.LikedBy, username)
+		post.ID = cur.Current.Index(0).Value().ObjectID()
+		post.IsLiked = utils.BinarySearch(post.LikedBy, userID)
 
-		aCur := achievementsCollection.FindOne(c.Context(), bson.D{
-			{"_id", r.Achievement},
-		})
-		aCur.Decode(&r.AchievementObj)
+		var ach models.Achievement
+		utils.GetAchievement(post.Achievement, c, &ach)
 
-		returnData[i] = r
+		var poster models.User
+		utils.GetUser(post.User, c, &poster)
+
+		simpleUser := utils.GetSerialisedUser(&poster, &user)
+		simpleAchievement := utils.GetSerialisedAchievement(&ach, &user)
+
+		returnData[i] = utils.GetSerialisedPost(&post, &simpleAchievement, &simpleUser, &user)
 		i++
 	}
 
@@ -76,8 +75,8 @@ func GetFeed(c *fiber.Ctx) error {
 
 func GetAllPoints(c *fiber.Ctx) error {
 	var user models.User
-	var username string = c.Locals("USER").(string)
-	utils.GetUser(username, c, &user)
+	userID, _ := primitive.ObjectIDFromHex(c.Locals("USER").(string))
+	utils.GetUser(userID, c, &user)
 
 	collection, err := utils.GetMongoDbCollection(c, "posts")
 	if err != nil {

@@ -6,13 +6,40 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	options2 "go.mongodb.org/mongo-driver/mongo/options"
 	"time"
 )
 
+func GetAllAchievements(c *fiber.Ctx) error {
+	var user models.User
+	userID, _ := primitive.ObjectIDFromHex(c.Locals("USER").(string))
+	utils.GetUser(userID, c, &user)
+
+	collection, err := utils.GetMongoDbCollection(c, "achievements")
+
+	if err != nil {
+		return fiber.ErrInternalServerError
+	}
+
+	cur, _ := collection.Find(c.Context(), bson.M{})
+	results := make([]models.SerialisedAchievement, cur.RemainingBatchLength())
+	i := 0
+
+	for cur.Next(c.Context()) {
+		var achievement models.Achievement
+		cur.Decode(&achievement)
+
+		results[i] = utils.GetSerialisedAchievement(&achievement, &user)
+		i++
+	}
+
+	return c.JSON(results)
+}
+
 func GetCompletedAchievements(c *fiber.Ctx) error {
 	var user models.User
-	var user_id string = c.Locals("USER").(string)
-	utils.GetUser(user_id, c, &user)
+	userID, _ := primitive.ObjectIDFromHex(c.Locals("USER").(string))
+	utils.GetUser(userID, c, &user)
 
 	collection, err := utils.GetMongoDbCollection(c, "achievements")
 
@@ -20,41 +47,30 @@ func GetCompletedAchievements(c *fiber.Ctx) error {
 		return fiber.ErrInternalServerError
 	}
 
-	var achievementIDs []primitive.ObjectID
-	achievementIDs = make([]primitive.ObjectID, len(user.Achievements))
-	for i, item := range user.Achievements {
-		b := bson.M(item)
-		achievementIDs[i] = b["achievement"].(primitive.ObjectID)
+	options := options2.Find()
+	options.SetSort(bson.M{ "achieved_by.achieved_at": 1 })
+
+	cur, _ := collection.Find(c.Context(), bson.M{
+		"achieved_by.user": userID,
+	}, options)
+	results := make([]models.SerialisedAchievement, cur.RemainingBatchLength())
+	i := 0
+
+	for cur.Next(c.Context()) {
+		var achievement models.Achievement
+		cur.Decode(&achievement)
+
+		results[i] = utils.GetSerialisedAchievement(&achievement, &user)
+		i++
 	}
 
-	cur, err := collection.Find(c.Context(), bson.D{
-		{
-			"_id",
-			bson.D{
-				{"$in", achievementIDs},
-			},
-		},
-	})
-
-	if cur == nil {
-		return fiber.ErrBadRequest
-	}
-
-	var results []bson.M
-	defer cur.Close(c.Context())
-
-	cur.All(c.Context(), &results)
-
-	if results == nil {
-		results = make([]bson.M, 0)
-	}
 	return c.JSON(results)
 }
 
-func GetIncompletedAchievements(c *fiber.Ctx) error {
+func GetIncompleteAchievements(c *fiber.Ctx) error {
 	var user models.User
-	var user_id string = c.Locals("USER").(string)
-	utils.GetUser(user_id, c, &user)
+	userID, _ := primitive.ObjectIDFromHex(c.Locals("USER").(string))
+	utils.GetUser(userID, c, &user)
 
 	collection, err := utils.GetMongoDbCollection(c, "achievements")
 
@@ -62,69 +78,20 @@ func GetIncompletedAchievements(c *fiber.Ctx) error {
 		return fiber.ErrInternalServerError
 	}
 
-	var achievementIDs []primitive.ObjectID
-	achievementIDs = make([]primitive.ObjectID, len(user.Achievements))
-	for i, item := range user.Achievements {
-		b := bson.M(item)
-		achievementIDs[i] = b["achievement"].(primitive.ObjectID)
-	}
-
-	cur, err := collection.Find(c.Context(), bson.M{
-		"$or": bson.A{
-			bson.D{
-				{
-					"_id",
-					bson.D{
-						{"$nin", achievementIDs},
-					},
-				},
-			},
-			bson.D{
-				{
-					"repeating",
-					true,
-				},
-			},
+	cur, _ := collection.Find(c.Context(), bson.M{
+		"achieved_by.user": bson.M{
+			"$ne": userID,
 		},
 	})
+	results := make([]models.SerialisedAchievement, cur.RemainingBatchLength())
+	i := 0
 
-	if cur == nil {
-		return fiber.ErrBadRequest
-	}
+	for cur.Next(c.Context()) {
+		var achievement models.Achievement
+		cur.Decode(&achievement)
 
-	var results []bson.M
-	defer cur.Close(c.Context())
-
-	cur.All(c.Context(), &results)
-
-	if results == nil {
-		results = make([]bson.M, 0)
-	}
-
-	return c.JSON(results)
-}
-
-func GetAllAchievements(c *fiber.Ctx) error {
-	collection, err := utils.GetMongoDbCollection(c, "achievements")
-
-	if err != nil {
-		return fiber.ErrInternalServerError
-	}
-
-	cur, err := collection.Find(c.Context(), bson.D{
-	})
-
-	if cur == nil {
-		return fiber.ErrBadRequest
-	}
-
-	var results []bson.M
-	defer cur.Close(c.Context())
-
-	cur.All(c.Context(), &results)
-
-	if results == nil {
-		results = make([]bson.M, 0)
+		results[i] = utils.GetSerialisedAchievement(&achievement, &user)
+		i++
 	}
 
 	return c.JSON(results)
@@ -132,16 +99,41 @@ func GetAllAchievements(c *fiber.Ctx) error {
 
 func DoAchievement(c *fiber.Ctx) error {
 	var user models.User
-	utils.GetUser(c.Locals("USER").(string), c, &user)
+	userID, _ := primitive.ObjectIDFromHex(c.Locals("USER").(string))
+	utils.GetUser(userID, c, &user)
 
-	username := c.Locals("USER").(string)
-	achievementID, _ := primitive.ObjectIDFromHex(c.Params("id"))
+	now := time.Now()
 
-	err := utils.AddUserAchievement(username, primitive.NilObjectID, achievementID, c, time.Now())
+	collection, err := utils.GetMongoDbCollection(c, "achievements")
 
 	if err != nil {
-		return err
+		return fiber.ErrInternalServerError
 	}
 
-	return c.SendStatus(201)
+	achievementID, _ := primitive.ObjectIDFromHex(c.Params("done"))
+	achievementUser := models.AchievementUser{User: userID, AchievedAt: now, Post: nil }
+
+	_, err = collection.UpdateOne(c.Context(), bson.M{
+		"_id": achievementID,
+	}, bson.M{
+		"achieved_by": bson.M{
+			"$push": bson.M{
+				"$each": bson.A{ achievementUser },
+				"$sort": bson.M{
+					"achieved_by.user": 1,
+				},
+			},
+		},
+	})
+
+	if err != nil {
+		return fiber.ErrBadRequest
+	}
+
+	var achievement models.Achievement
+	utils.GetAchievement(achievementID, c, &achievement)
+
+	serialised := utils.GetSerialisedAchievement(&achievement, &user)
+
+	return c.JSON(serialised)
 }

@@ -6,99 +6,57 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	options2 "go.mongodb.org/mongo-driver/mongo/options"
-	"time"
 )
 
-func GetUser(username string, c *fiber.Ctx, user *models.User) {
-	collection, err := GetMongoDbCollection(c,"users")
+func AddUserAchievement(user models.User, c *fiber.Ctx, ach *models.Achievement, uAch models.UserAchievement) error {
+	userCol, _ := GetMongoDbCollection(c, "users")
 
-	if username == "" || err != nil {
-		return
-	}
-
-	filter := bson.M{"username": username}
-
-	cur := collection.FindOne(c.Context(), filter)
-
-	cur.Decode(user)
-}
-
-func AddUserAchievement(username string, postID primitive.ObjectID,
-	achievementID primitive.ObjectID, c *fiber.Ctx, now time.Time) error {
-	achievementCol, err := GetMongoDbCollection(c,"achievements")
-
-	if err != nil {
-		return err
-	}
-
-	var achievement bson.M
-	cur := achievementCol.FindOne(c.Context(), bson.D{{"_id", achievementID}})
-	cur.Decode(&achievement)
-
-
-	_, err = achievementCol.UpdateOne(c.Context(),
-		bson.D{{"_id", achievementID}},
-		bson.D{{"$push", bson.D{{
-			"achievedby", bson.M{
-				"user":       username,
-				"achievedAt": now,
-				"post":       postID,
-			},
-		}}}})
-
-	if err == nil {
-		userCol, _ := GetMongoDbCollection(c,"users")
-
-		_, err = userCol.UpdateOne(c.Context(),
-			bson.D{{"username", username}},
-			bson.M{"$push": bson.D{{
-				"achievements", bson.M{
-					"achievedAt":  now,
-					"post":        postID,
-					"achievement": achievementID,
+	_, err := userCol.UpdateOne(c.Context(),
+		bson.D{{"_id", user.ID}},
+		bson.M{"$push": bson.M{
+			"achievements": bson.M{
+				"$each": bson.A{uAch},
+				"$sort": bson.M{
+					"achievements.achievement": 1,
 				},
-			}},
-			"$inc": bson.D{{
-				"points", achievement["points"],
-				}},
-			})
+			},
+		},
+		"$inc": bson.M{
+			"points": ach.Points,
+		},
+})
 
-		return err
-	} else {
-		return err
-	}
+return err
 }
 
-func GetPosts(username string, posts *[]models.ReturnPost, c *fiber.Ctx) {
-	postCol, _ := GetMongoDbCollection(c,"posts")
+func GetPosts(userID primitive.ObjectID, posts *[]models.SerialisedPost, c *fiber.Ctx, user *models.User) {
+	postCol, _ := GetMongoDbCollection(c, "posts")
 
 	options := options2.Find()
 	options.SetSort(bson.M{
-		"createdat": -1,
+		"created_at": -1,
 	})
 
 	cur, _ := postCol.Find(c.Context(), bson.D{{
-		"user", username,
+		"user", userID,
 	}}, options)
 
-
-	achievementsCollection, _ := GetMongoDbCollection(c, "achievements")
-
-	*posts = make([]models.ReturnPost, cur.RemainingBatchLength())
+	*posts = make([]models.SerialisedPost, cur.RemainingBatchLength())
 	i := 0
 	for cur.Next(c.Context()) {
-		var r models.ReturnPost
+		var r models.Post
 		cur.Decode(&r)
 
-		r.ID = cur.Current.Index(0).Value().ObjectID()
-		r.IsLiked = BinarySearch(r.LikedBy, username)
+		var a models.Achievement
+		GetAchievement(r.Achievement, c, &a)
 
-		aCur := achievementsCollection.FindOne(c.Context(), bson.D{
-			{"_id", r.Achievement},
-		})
-		aCur.Decode(&r.AchievementObj)
+		var u models.User
+		GetUser(r.User, c, &u)
 
-		(*posts)[i] = r
+		su := GetSerialisedUser(&u, user)
+		sa := GetSerialisedAchievement(&a, user)
+
+		(*posts)[i] = GetSerialisedPost(&r, &sa, &su, user)
 		i++
 	}
 
