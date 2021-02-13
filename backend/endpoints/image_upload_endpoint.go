@@ -6,6 +6,9 @@ import (
 	"ecothon/utils"
 	"encoding/json"
 	"fmt"
+	"image"
+	"image/jpeg"
+	_ "image/png" //need to decode pngs
 	"os"
 	"strconv"
 	"strings"
@@ -16,6 +19,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/gofiber/fiber/v2"
+	"github.com/nfnt/resize"
 )
 
 type upload struct {
@@ -77,8 +81,6 @@ func UploadImage(c *fiber.Ctx) error {
 	var username string = c.Locals("USER").(string)
 	utils.GetUser(username, c, &user)
 
-	fmt.Println(string(c.Request().Header.ContentType()))
-
 	key := os.Getenv("ECOTHON_SPACES_KEY")
 	secret := os.Getenv("ECOTHON_SPACES_SECRET")
 
@@ -91,21 +93,34 @@ func UploadImage(c *fiber.Ctx) error {
 	newSession := session.New(s3Config)
 	s3Client := s3.New(newSession)
 
-	ext := strings.Split(string(c.Request().Header.ContentType()), "/")[1]
+	ext := "jpg"
 
-	filename := fmt.Sprintf("%s-%s.%s", user.Username, strconv.FormatInt(time.Now().Unix(), 10), ext)
+	filename := fmt.Sprintf("%s-%s.%s", username, strconv.FormatInt(time.Now().Unix(), 10), ext)
+
+	srcImage, _, decodeErr := image.Decode(bytes.NewReader(c.Body()))
+	if decodeErr != nil {
+		fmt.Println(decodeErr.Error())
+	}
+
+	dstImage := resize.Resize(800, 0, srcImage, resize.Lanczos3)
+
+	bytesImage := new(bytes.Buffer)
+	encodeErr := jpeg.Encode(bytesImage, dstImage, nil)
+	if encodeErr != nil {
+		fmt.Println(encodeErr.Error())
+	}
 
 	object := s3.PutObjectInput{
 		Bucket:      aws.String("ecothon"),
 		Key:         aws.String(filename),
-		Body:        bytes.NewReader(c.Body()),
+		Body:        bytes.NewReader(bytesImage.Bytes()),
 		ACL:         aws.String("public-read"),
-		ContentType: aws.String(string(c.Request().Header.ContentType())),
+		ContentType: aws.String("image/jpg"),
 	}
 
-	_, err := s3Client.PutObject(&object)
-	if err != nil {
-		fmt.Println(err.Error())
+	_, uploadErr := s3Client.PutObject(&object)
+	if uploadErr != nil {
+		fmt.Println(uploadErr.Error())
 	}
 
 	return c.JSON(map[string]string{"url": "https://ecothon.fra1.digitaloceanspaces.com/" + filename})
