@@ -3,18 +3,17 @@ package utils
 import (
 	"errors"
 	"fmt"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
 )
 
-const TOKENEXP string = "12w"
+const TOKENEXP string = "2016h"
 const TOKENKEY string = "hello"
 
 // TokenPayload defines the payload for the token
 type TokenPayload struct {
-	ID primitive.ObjectID
+	ID string
 }
 
 // Generate generates the jwt token based on payload
@@ -60,17 +59,19 @@ func Verify(token string) (*TokenPayload, error) {
 	parsed, err := parse(token)
 
 	if err != nil {
+		print(err.Error())
 		return nil, err
 	}
 
 	// Parsing token claims
 	claims, ok := parsed.Claims.(jwt.MapClaims)
 	if !ok {
+		print(ok)
 		return nil, err
 	}
 
 	// Getting ID, it's an interface{} so I need to cast it to uint
-	id, ok := claims["ID"].(primitive.ObjectID)
+	id, ok := claims["ID"].(string)
 	if !ok {
 		return nil, errors.New("Something went wrong")
 	}

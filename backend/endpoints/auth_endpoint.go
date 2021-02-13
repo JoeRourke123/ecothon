@@ -64,7 +64,7 @@ func CreateUser(c *fiber.Ctx) error {
 
 
 	t := utils.Generate(&utils.TokenPayload{
-		ID: newCur.InsertedID.(primitive.ObjectID),
+		ID: newCur.InsertedID.(primitive.ObjectID).String(),
 	})
 
 	return c.JSON(
@@ -123,7 +123,7 @@ func LoginUser(ctx *fiber.Ctx) error {
 	}
 
 	t := utils.Generate(&utils.TokenPayload{
-		ID: user.ID,
+		ID: user.ID.String(),
 	})
 
 	return ctx.JSON(
