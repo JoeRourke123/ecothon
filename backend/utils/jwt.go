@@ -9,7 +9,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-const TOKENEXP string = "10h"
+const TOKENEXP string = "12w"
 const TOKENKEY string = "hello"
 
 // TokenPayload defines the payload for the token
