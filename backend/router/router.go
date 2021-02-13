@@ -13,9 +13,10 @@ func SetupRoutes(app *fiber.App) {
 	api := app.Group("/api")
 
 	user := api.Group("/user")
-	user.Get("/user/:id/profile", middleware.Auth, endpoints.UserProfile)
-	user.Post("/user/:id/follow", middleware.Auth, endpoints.UserFollow)
-	user.Put("/user/profile-picture", middleware.Auth, endpoints.SetProfilePicture)
+	user.Get("/:id/profile", middleware.Auth, endpoints.UserProfile)
+	user.Post("/:id/follow", middleware.Auth, endpoints.UserFollow)
+	user.Get("/:id/details", middleware.Auth, endpoints.GetUserDetails)
+	user.Put("/profile-picture", middleware.Auth, endpoints.SetProfilePicture)
 	user.Post("/create", endpoints.CreateUser)
 	user.Post("/login", endpoints.LoginUser)
 

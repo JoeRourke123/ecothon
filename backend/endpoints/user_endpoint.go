@@ -77,10 +77,18 @@ func CreateUser(c *fiber.Ctx) error {
 }
 
 func GetUserDetails(c *fiber.Ctx) error {
+	var currentUser models.User
+	currentUID, _ := primitive.ObjectIDFromHex(c.Locals("USER").(string))
+	utils.GetUser(currentUID, c, &currentUser)
+
 	id, _ := primitive.ObjectIDFromHex(c.Params("id"))
 
 	var user models.User
 	utils.GetUser(id, c, &user)
+
+	if currentUser.ID != user.ID {
+		return fiber.ErrForbidden
+	}
 
 	serialised := utils.GetSerialisedUser(&user, nil)
 
