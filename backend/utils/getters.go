@@ -32,7 +32,10 @@ func GetAchievement(id primitive.ObjectID, c *fiber.Ctx, achievement *models.Ach
 
 	cur := collection.FindOne(c.Context(), filter)
 
-	cur.Decode(achievement)
+	err = cur.Decode(achievement)
+	if err != nil {
+		print(err.Error())
+	}
 }
 
 func GetPost(id primitive.ObjectID, c *fiber.Ctx, post *models.Post) {

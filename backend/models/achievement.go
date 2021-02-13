@@ -21,7 +21,7 @@ type SerialisedAchievementUser struct {
 type Achievement struct {
 	ID              primitive.ObjectID `json:"id" bson:"_id"`
 	Title           string             `json:"title" bson:"title"`
-	CarbonReduction float32            `json:"carbon_reduction" bson:"carbon_reduction"`
+	CarbonReduction float64            `json:"carbon_reduction" bson:"carbon_reduction"`
 	Repeating       bool               `json:"repeating" bson:"repeating"`
 	Points          int32              `json:"points" bson:"points"`
 	AchievedBy      []AchievementUser  `json:"achieved_by" bson:"achieved_by"`
@@ -32,7 +32,7 @@ type Achievement struct {
 type SerialisedAchievement struct {
 	ID              primitive.ObjectID `json:"id" bson:"_id"`
 	Title           string             `json:"title" bson:"title"`
-	CarbonReduction float32            `json:"carbon_reduction" bson:"carbon_reduction"`
+	CarbonReduction float64            `json:"carbon_reduction" bson:"carbon_reduction"`
 	Repeating       bool               `json:"repeating" bson:"repeating"`
 	Points          int32              `json:"points" bson:"points"`
 	Image           string             `json:"image" bson:"image"`

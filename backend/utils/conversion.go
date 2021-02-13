@@ -8,6 +8,7 @@ func GetSerialisedAchievement(a *models.Achievement, user *models.User) models.S
 	completed := SearchUserAchievements(user.Achievements, a.ID)
 
 	s.ID = a.ID
+	s.Title = a.Title
 	s.Points = a.Points
 	s.CarbonReduction = a.CarbonReduction
 	s.Image = a.Image
@@ -57,6 +58,8 @@ func GetSerialisedUser(u *models.User, me *models.User) models.SerialisedUser {
 	s.IsSecret = u.IsSecret
 	s.FirstName = u.FirstName
 	s.LastName = u.LastName
+	s.CurrentCarbon = u.CurrentCarbon
+	s.StartingCarbon = u.StartingCarbon
 
 	return s
 }

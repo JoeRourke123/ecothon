@@ -28,6 +28,7 @@ func CreatePost(c *fiber.Ctx) error {
 	var post models.Post
 	json.Unmarshal([]byte(c.Body()), &post)
 
+	post.ID = primitive.NewObjectID()
 	post.Geolocation.Type = "Point"
 	post.CreatedAt = now
 	post.User = userID
@@ -51,7 +52,7 @@ func CreatePost(c *fiber.Ctx) error {
 		userAchievement := models.UserAchievement{
 			AchievedAt:  time.Now(),
 			Achievement: achievement.ID,
-			Post:        res.InsertedID.(primitive.ObjectID),
+			Post:        post.ID,
 		}
 
 		err := utils.AddUserAchievement(user, c, &achievement, userAchievement)
