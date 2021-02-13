@@ -111,7 +111,7 @@ func DoAchievement(c *fiber.Ctx) error {
 	}
 
 	achievementID, _ := primitive.ObjectIDFromHex(c.Params("done"))
-	achievementUser := models.AchievementUser{User: userID, AchievedAt: now, Post: nil }
+	achievementUser := models.AchievementUser{User: userID, AchievedAt: now }
 
 	_, err = collection.UpdateOne(c.Context(), bson.M{
 		"_id": achievementID,

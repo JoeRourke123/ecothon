@@ -16,9 +16,6 @@ func AddUserAchievement(user models.User, c *fiber.Ctx, ach *models.Achievement,
 		bson.M{"$push": bson.M{
 			"achievements": bson.M{
 				"$each": bson.A{uAch},
-				"$sort": bson.M{
-					"achievements.achievement": 1,
-				},
 			},
 		},
 		"$inc": bson.M{

@@ -2,7 +2,6 @@ package endpoints
 
 import (
 	"ecothon/models"
-	"ecothon/responses"
 	"ecothon/utils"
 	"encoding/json"
 	"fmt"
@@ -46,6 +45,7 @@ func CreateUser(c *fiber.Ctx) error {
 		return c.JSON(bson.M{ "error": "An account with that email already exists! "})
 	}
 
+	user.ID = primitive.NewObjectID()
 	user.AccountCreated = time.Now()
 	user.Points = 0
 
@@ -57,28 +57,21 @@ func CreateUser(c *fiber.Ctx) error {
 
 	user.Password = generateHash([]byte(user.Password))
 
-	newCur, err := collection.InsertOne(c.Context(), user)
+	_, err = collection.InsertOne(c.Context(), user)
 	if err != nil {
 		return fiber.ErrInternalServerError
 	}
 
-
 	t := utils.Generate(&utils.TokenPayload{
-		ID: newCur.InsertedID.(primitive.ObjectID).String(),
+		ID: user.ID.Hex(),
 	})
 
+	serialisedUser := utils.GetSerialisedUser(&user, nil)
+
 	return c.JSON(
-		&responses.AuthResponse{
-			User: &responses.UserResponse{
-				Email:          user.Email,
-				Username:       user.Username,
-				FirstName:      user.FirstName,
-				LastName:       user.LastName,
-				AccountCreated: user.AccountCreated,
-				StartingCarbon: user.StartingCarbon,
-				CurrentCarbon:  user.CurrentCarbon,
-			},
-			Auth: &t,
+		bson.M{
+			"user": serialisedUser,
+			"auth": t,
 		},
 	)
 }
@@ -123,21 +116,15 @@ func LoginUser(ctx *fiber.Ctx) error {
 	}
 
 	t := utils.Generate(&utils.TokenPayload{
-		ID: user.ID.String(),
+		ID: user.ID.Hex(),
 	})
 
+	serialisedUser := utils.GetSerialisedUser(&user, nil)
+
 	return ctx.JSON(
-		&responses.AuthResponse{
-			User: &responses.UserResponse{
-				Email:          user.Email,
-				Username:       user.Username,
-				FirstName:      user.FirstName,
-				LastName:       user.LastName,
-				AccountCreated: user.AccountCreated,
-				StartingCarbon: user.StartingCarbon,
-				CurrentCarbon:  user.CurrentCarbon,
-			},
-			Auth: &t,
+		bson.M{
+			"user": serialisedUser,
+			"auth": t,
 		},
 	)
 }

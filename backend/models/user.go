@@ -28,8 +28,8 @@ type User struct {
 	Password       string             `json:"password,secret" bson:"password"`
 	Achievements   []UserAchievement  `json:"achievements" bson:"achievements"`
 	Points         int16              `json:"points" bson:"points"`
-	StartingCarbon float32            `json:"carbon_estimate" bson:"carbon_estimate"`
-	CurrentCarbon  float32            `json:"current_estimate" bson:"current_estimate"`
+	StartingCarbon float64            `json:"carbon_estimate" bson:"carbon_estimate"`
+	CurrentCarbon  float64            `json:"current_estimate" bson:"current_estimate"`
 	AccountCreated time.Time          `json:"account_created" bson:"account_created"`
 	Followers      []primitive.ObjectID           `json:"followers" bson:"followers"`
 	Following      []primitive.ObjectID           `json:"following" bson:"following"`
@@ -45,4 +45,6 @@ type SerialisedUser struct {
 	Points         int16              `json:"points" bson:"points"`
 	IsSecret       bool               `json:"is_secret" bson:"is_secret"`
 	IsFollowing    bool               `json:"is_following" bson:"is_following"`
+	StartingCarbon float64            `json:"carbon_estimate" bson:"carbon_estimate"`
+	CurrentCarbon  float64            `json:"current_estimate" bson:"current_estimate"`
 }
