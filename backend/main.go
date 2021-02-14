@@ -13,18 +13,21 @@ import (
 const port string = "localhost:4000"
 
 func main() {
-	app := fiber.New(fiber.Config{ServerHeader: "just-a-hapi-guy/2.0"})
+	app := fiber.New(
+		fiber.Config{
+			ServerHeader: "ecothon-server/1.0",
+			BodyLimit:    10 * 1024 * 1024,
+		})
 
 	file, err := os.OpenFile("./ecothon.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
-   		log.Fatalf("error opening file: %v", err)
+		log.Fatalf("error opening file: %v", err)
 	}
 	defer file.Close()
 
 	app.Use(logger.New(logger.Config{
-    	Output: file,
-	}))
-	app.Use(compress.New())
+		Output: file,
+	}), compress.New())
 
 	app.Static("/", "./static")
 	router.SetupRoutes(app)

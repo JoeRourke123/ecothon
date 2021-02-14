@@ -3,12 +3,26 @@ package router
 import (
 	"ecothon/endpoints"
 	"ecothon/middleware"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/limiter"
 )
 
 // SetupRoutes setup router api
 func SetupRoutes(app *fiber.App) {
+	// Request limiter
+	limit := limiter.New(limiter.Config{
+		Max:        5,
+		Expiration: 1 * time.Minute,
+		KeyGenerator: func(c *fiber.Ctx) string {
+			return c.IP()
+		},
+		LimitReached: func(c *fiber.Ctx) error {
+			return c.Status(429).JSON(map[string]string{"error": "Please make requests less often."})
+		},
+	})
+
 	/// API
 	api := app.Group("/api")
 
@@ -42,17 +56,7 @@ func SetupRoutes(app *fiber.App) {
 
 	//// Upload image
 	upload := api.Group("/upload")
-	upload.Post("/generate-url", middleware.Auth, endpoints.CreateUploadURL)
-	upload.Post("/image", middleware.Auth, endpoints.UploadImage)
+	// upload.Post("/generate-url", middleware.Auth, endpoints.CreateUploadURL) // currently broken
+	upload.Post("/image", limit, middleware.Auth, endpoints.UploadImage)
 
-	//// Auth
-	//auth := api.Group("/auth")
-	//auth.Post("/login", handler.Login)
-	//
-	//// Products
-	//product := api.Group("/product")
-	//product.Get("/", handler.GetAllProducts)
-	//product.Get("/:id", handler.GetProduct)
-	//product.Post("/", middleware.Protected(), handler.CreateProduct)
-	//product.Delete("/:id", middleware.Protected(), handler.DeleteProduct)
 }
