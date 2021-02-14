@@ -11,7 +11,7 @@ import (
 
 func GetAllAchievements(c *fiber.Ctx) error {
 	var user models.User
-	userID := c.Locals("USER").(primitive.ObjectID)
+	userID, _ := primitive.ObjectIDFromHex(c.Locals("USER").(string))
 	utils.GetUser(userID, c, &user)
 
 	collection, err := utils.GetMongoDbCollection(c, "achievements")
