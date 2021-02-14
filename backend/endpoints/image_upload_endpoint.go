@@ -81,6 +81,46 @@ func UploadImage(c *fiber.Ctx) error {
 	var username string = c.Locals("USER").(string)
 	utils.GetUser(username, c, &user)
 
+	originalBytes := bytes.NewReader(c.Body())
+
+	config, ext, err := image.DecodeConfig(originalBytes)
+	if err != nil {
+		fmt.Println(err.Error())
+		return c.Status(422).JSON(map[string]string{"error": "This image is invalid - please send .jpg or .png"})
+	}
+
+	bytesOut := new(bytes.Buffer)
+
+	originalBytes.Reset(c.Body())
+	if config.Height > 800 || config.Width > 800 {
+		defer func() {
+			if err := recover(); err != nil {
+				fmt.Println("Image could not be resized:", err)
+				c.Status(422).JSON(map[string]string{"error": "This image could not be resized"})
+			}
+		}()
+
+		srcImage, _, decodeErr := image.Decode(originalBytes)
+		if decodeErr != nil {
+			fmt.Println(decodeErr.Error())
+			return c.Status(422).JSON(map[string]string{"error": "This image is corrupted"})
+		}
+
+		dstImage := resize.Resize(800, 0, srcImage, resize.Lanczos3)
+
+		encodeErr := jpeg.Encode(bytesOut, dstImage, nil)
+		if encodeErr != nil {
+			fmt.Println(encodeErr.Error())
+			return c.Status(422).JSON(map[string]string{"error": "Could not encode this image"})
+		}
+
+		ext = "jpg"
+	} else {
+		bytesOut.ReadFrom(originalBytes)
+	}
+
+	filename := fmt.Sprintf("%s-%s.%s", user.Username, strconv.FormatInt(time.Now().Unix(), 10), ext)
+
 	key := os.Getenv("ECOTHON_SPACES_KEY")
 	secret := os.Getenv("ECOTHON_SPACES_SECRET")
 
@@ -93,35 +133,19 @@ func UploadImage(c *fiber.Ctx) error {
 	newSession := session.New(s3Config)
 	s3Client := s3.New(newSession)
 
-	ext := "jpg"
-
-	filename := fmt.Sprintf("%s-%s.%s", username, strconv.FormatInt(time.Now().Unix(), 10), ext)
-
-	srcImage, _, decodeErr := image.Decode(bytes.NewReader(c.Body()))
-	if decodeErr != nil {
-		fmt.Println(decodeErr.Error())
-	}
-
-	dstImage := resize.Resize(800, 0, srcImage, resize.Lanczos3)
-
-	bytesImage := new(bytes.Buffer)
-	encodeErr := jpeg.Encode(bytesImage, dstImage, nil)
-	if encodeErr != nil {
-		fmt.Println(encodeErr.Error())
-	}
-
 	object := s3.PutObjectInput{
 		Bucket:      aws.String("ecothon"),
 		Key:         aws.String(filename),
-		Body:        bytes.NewReader(bytesImage.Bytes()),
+		Body:        bytes.NewReader(bytesOut.Bytes()),
 		ACL:         aws.String("public-read"),
-		ContentType: aws.String("image/jpg"),
+		ContentType: aws.String("image/" + ext),
 	}
 
 	_, uploadErr := s3Client.PutObject(&object)
 	if uploadErr != nil {
 		fmt.Println(uploadErr.Error())
+		return c.Status(500).JSON(map[string]string{"error": "Failed to upload image to s3"})
 	}
 
-	return c.JSON(map[string]string{"url": "https://ecothon.fra1.digitaloceanspaces.com/" + filename})
+	return c.Status(201).JSON(map[string]string{"url": "https://ecothon.fra1.digitaloceanspaces.com/" + filename})
 }
