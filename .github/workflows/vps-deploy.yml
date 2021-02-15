@@ -1,10 +1,13 @@
-name: deploy to vps
+name: Deploy to VPS (ecothon.space)
 
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  paths:
+    - 'backend/**'
+    - '.github/workflows/**'
 
 jobs:
 
@@ -23,11 +26,6 @@ jobs:
     
     - uses: actions/cache@v2
       with:
-        # In order:
-        # * Module download cache
-        # * Build cache (Linux)
-        # * Build cache (Mac)
-        # * Build cache (Windows)
         path: |
           ~/go/pkg/mod
           ~/.cache/go-build
@@ -40,27 +38,26 @@ jobs:
     - name: go build it
       run: go build
     
-    - name: list files
-      run: ls -lahR
+    # - name: list files
+    #   run: ls -lahR
 
-    - name: copy build artifacts to deploy
+    - name: Copy build artifacts to VPS
       uses: appleboy/scp-action@master
       with:
-        host: git.honeyfox.uk
+        host: ecothon.space
         username: ecothon
         key: ${{ secrets.SSH_KEY }}
         source: "backend/ecothon, backend/static/"
         target: "~/"
         
-    - name: restart ecothon server
+    - name: Restart ecothon server
       uses: appleboy/ssh-action@master
       with:
-        host: git.honeyfox.uk
+        host: ecothon.space
         username: ecothon
         key: ${{ secrets.SSH_KEY }}
         script: |
           mv static static.bak
           mv backend/* .
-          ls -alh
           sudo /bin/systemctl restart ecothon
           rm -r static.bak/ backend/
